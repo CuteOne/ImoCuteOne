@@ -23,6 +23,7 @@ udbid = UnitDebuffID
 pow = UnitPower(p)
 repow = select(2, GetPowerRegen(p))
 powmax = UnitPowerMax(p)
+powper = (UnitPower(p) / UnitPowerMax(p))*100
 if repow == 0 or repow==nil then
   tmp = 9999999
 else
@@ -135,6 +136,30 @@ function timecheck()
 		cTime = 0
 	end
 	return cTime
+end
+
+-- Behind Check
+function BehindFunc()
+	if behindTimer == nil then
+		behindTimer = 0
+ 	end
+ local BehindCheck = PQR_CheckUIError(SPELL_FAILED_NOT_BEHIND)
+ if BehindCheck==nil then
+  BehindCheck = true
+ end
+ bTimer = GetTime() - behindTimer
+ if BehindCheck and behindTimer == 0 then
+  behindTimer = GetTime()
+  behind = false
+ end
+ if not BehindCheck and bTimer > 0 then
+  behindTimer = 0
+  behind = true
+ end
+ if bTimer > 3 and bTimer < 10 then
+  behindTimer = 0
+  behind = false
+ end
 end
 
 ---Spell Check
@@ -291,27 +316,6 @@ function TalentCheck(talentid)
 		end
 	end
 	return false
-end
-
--- Behind Check
-function BehindFunc()
-	if behindTimer == nil then
-		behindTimer = 0
-	end
-	local BehindCheck = PQR_CheckUIError(SPELL_FAILED_NOT_BEHIND)
-	Timer = GetTime() - behindTimer
-	if BehindCheck and behindTimer == 0 then
-		behindTimer = GetTime()
-		behind = false
-	end
-	if not BehindCheck and Timer > 0 then
-		behindTimer = 0
-		behind = true
-	end
-	if Timer > 3 and Timer < 10 then
-		behindTimer = 0
-		behind = false
-	end
 end
 
 ------Member Check------
@@ -493,7 +497,7 @@ function totemDistance()
          local h1 = (f - g)
          local distance = sqrt(min(x1 - x2, w - (x1 - x2))^2 + min(y1 - y2, h1 - (y1-y2))^2)
          
-         return distance
+         return round2(distance,2)
      else
          return 0
      end
@@ -830,14 +834,14 @@ nGTT:AddFontStrings(
    nGTT:CreateFontString( "$parentTextRight1", nil, "GameTooltipText" ) );
 nDbDmg = nil
 --print(issecure()) -- before function is ran, but after TT is created
-function nDbDmg(spellID, tar)
+function nDbDmg(tar, spellID, player)
    if GetCVar("DotDamage") == nil then
       RegisterCVar("DotDamage", 0)
    end
    nGTT:ClearLines()
    for i=1, 40 do
-      if UnitDebuff(tar, i) == GetSpellInfo(spellID) then
-         nGTT:SetUnitDebuff(tar, i)
+      if UnitDebuff(tar, i, player) == GetSpellInfo(spellID) then
+         nGTT:SetUnitDebuff(tar, i, player)
          scanText=_G["MyScanningTooltipTextLeft2"]:GetText()
          local DoTDamage = scanText:match("([0-9]+%.?[0-9]*)")
 		 if not issecure() then print(issecure()) end -- function is called inside the profile

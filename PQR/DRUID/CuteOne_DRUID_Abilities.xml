@@ -47,7 +47,6 @@ grl	=	6795	--Growl
 ht	=	5185	--Healing Touch
 hib	=	2637	--Hibernate
 hur	=	16914	--Hurricane
-inc	=	106731	--Incarnation: King of the Jungle
 inn	=	29166	--Innervate
 lac =	33745	--Lacerate
 ma	=	22570	--Maim
@@ -87,8 +86,8 @@ trf	=	783		--Travel Form
 wth =	5176	--Wrath
 
 ------Talents------
+inc	=	106731	--Incarnation: King of the Jungle
 fon	=	106737	--Force of Nature
---fonchrg = GetSpellCharges(fon)	--Force of Nature Charges
 how	=	108288 	--Heart of the Wild
 mb	=	5211	--Mighty Bash
 ty	=	132469	--Typhoon
@@ -105,7 +104,9 @@ srf =	114236	--Shred Glyph
 inb = 	102543	--Incarnation: King of the Jungle buff
 ro1	=	139121	--Rune of Re-Origination: Haste
 ro2	=	139117	--Rune of Re-Origination: Critical Strike
-ro3	=	139120	----Rune of Re-Origination: Mastery
+ro3	=	139120	--Rune of Re-Origination: Mastery
+frf =	144865	--Feral Fury
+spd	=	81022	--Stampede
 
 -----SYMBIOSIS SPELLS------
 symdk	=	122282 	--Death Coil
@@ -208,6 +209,12 @@ if symcast==nil then
 end
 
 ------BUFF/DEBUFF TRACKING------
+-- Assurance of Consequence
+if ubid(p,146308) then
+	dex = (select(7,ubid(p,146308)) - GetTime())
+else
+	dex = 0
+end
 -- Rune of Reorigination
 if ubid(p,ro1) or ubid(p,ro2) or ubid(p,ro3) then
 	if ubid(p,ro1) then
@@ -238,31 +245,23 @@ else
 	docbuff = select(4,ubid(p,dcd))
 	dcb = 1.25
 end
--- Damage Formulas
-		
-mgld = ((((select(2, UnitDamage(&amp;quot;player&amp;quot;)) - select(1, UnitDamage(&amp;quot;player&amp;quot;)))/2)*5)+390)*dcb
-crkd = (((UnitAttackPower(&amp;quot;player&amp;quot;)*0.3)+99)*(1+(GetMasteryEffect()/100))*select(7, UnitDamage(&amp;apos;player&amp;apos;)))*dcb --Rake Damage
-if nDbDmg(rk, t)~=nil then
-	rkd = nDbDmg(rk, t)
+-- Damage Formulas	
+mgld = (((((select(1, UnitDamage(&amp;quot;player&amp;quot;)) + select(2, UnitDamage(&amp;quot;player&amp;quot;)))/2)/2)*5)+(390*select(7,UnitDamage(&amp;quot;player&amp;quot;))))*dcb
+--crkd = floor((99 + (0.3*UnitAttackPower(&amp;quot;player&amp;quot;)))*(1+(GetMasteryEffect()/100))*select(7, UnitDamage(&amp;apos;player&amp;apos;)))*dcb --Rake Damage
+crkd = ((118 + (0.368 * UnitAttackPower(&amp;apos;player&amp;apos;))) * (1 + GetMasteryEffect() / 100) * 0.8154868 * select(7, UnitDamage(&amp;apos;player&amp;apos;)))*dcb
+if nDbDmg(t,rk,p)~=nil then
+	rkd = nDbDmg(t,rk,p)
 else
-	rkd = 0
+	rkd = 1
 end
-if rkd &amp;gt; 0 then
-	rkp = round2(((crkd / rkd)*100),2)
+rkp = round2(((crkd / rkd)*100),2)
+crpd = (floor(113 + 320 * cp * (1+(GetMasteryEffect()/100)) + 0.04851 * cp * UnitAttackPower(&amp;quot;player&amp;quot;) * (1+(GetMasteryEffect()/100)))*select(7, UnitDamage(&amp;apos;player&amp;apos;)))*dcb --Rip Damage
+if nDbDmg(t,rp,p)~=nil then
+	rpd = nDbDmg(t,rp,p)
 else
-	rkp = 0
+	rpd = 1
 end
-crpd = ((113 + 320 * 5 * 1 + 0.0484 * 5 * UnitAttackPower(&amp;quot;player&amp;quot;) * 1)*(1+(GetMasteryEffect()/100))*select(7, UnitDamage(&amp;apos;player&amp;apos;)))*dcb
-if nDbDmg(rp, t)~=nil then
-	rpd = nDbDmg(rp, t)
-else
-	rpd = 0
-end
-if rpd &amp;gt; 0 then
-	rpp = round2(((crpd / rpd)*100),2)
-else
-	rpp = 0
-end
+rpp = round2(((crpd / rpd)*100),2)
 -- Rip Tracker and Attack Power Set
 if udbid(t,rp,p) and plvl &amp;gt;= 20 then
 	rpr = (select(7, udbid(t,rp,p)) - GetTime())
@@ -290,10 +289,20 @@ else
 	end
 end
 -- Berserk - Unit Power requirement modifier as Berserk makes energy usage half
-if ubid(p,ber) then
-	pow = pow*2
+if ubid(p,cc) then
+	if incom and sir(gsi(mgl),t)==1 and ubid(p,cf) then
+		if plvl&amp;gt;=28 and thrr &amp;lt; 3 and ttd(t)&amp;gt;=6 and rpr &amp;gt; 3 and rkr &amp;gt; 3 then
+			cast(gsi(thr))
+		else
+			pow = 999
+		end
+	end
 else
-	pow = UnitPower(p)
+	if ubid(p,ber) then
+		pow = pow*2
+	else
+		pow = UnitPower(p)
+	end
 end
 -- Weakened Armor Tracker and Stack Count
 if udbid(t,wa) then
@@ -424,7 +433,8 @@ end
 
 -- PQI Addon: Toggle Status Display
 PQR_Event(&amp;quot;PQR_Text&amp;quot;,&amp;apos;CD-Mode: &amp;apos;..PQ_CDMode..&amp;apos; --- &amp;apos;..&amp;apos;AOE-Mode: &amp;apos;..PQ_Rot..&amp;apos; --- &amp;apos;..&amp;apos;Sym-Mode: &amp;apos;..PQ_Symb)
---PQR_Event(&amp;quot;PQR_Text&amp;quot;,&amp;apos;rpd: &amp;apos;..round2(rpd,2)..&amp;apos; --- &amp;apos;..&amp;apos;crpd: &amp;apos;..round2(crpd,2)..&amp;apos; --- &amp;apos;..&amp;apos;rpp: &amp;apos;..rpp)
+--PQR_Event(&amp;quot;PQR_Text&amp;quot;,&amp;apos;rkd: &amp;apos;..round2(rkd,0)..&amp;apos; --- &amp;apos;..&amp;apos;crkd: &amp;apos;..round2(crkd,0)..&amp;apos; --- &amp;apos;..&amp;apos;rkp: &amp;apos;..round2(rkp,0))
+
 
 ------ETC------
 -- Data File Functions
@@ -436,6 +446,13 @@ if UnitExists(&amp;quot;target&amp;quot;)~=nil then
 	bossID = tonumber(UnitGUID(t):sub(-13, -9), 16)
 else
 	bossID = 0
+end
+
+-- Shred Check
+if ((ubid(p,ber) or ubid(p,tf)) and svg==true) or behind==true then
+	canshr = true
+else
+	canshr = false
 end
 
 -- Mouse click to add to queue
@@ -476,13 +493,22 @@ end
 	and pow&amp;gt;=75 
 	and check(ber) 
 	and ubid(p,sr) 
-	and ubid(p,tf) --or (ttd(t) &amp;lt; 18 and cd(tf) &amp;gt; 6))
+	and ubid(p,tf)
 	and sir(gsi(mgl),t)==1 
 	and cd(gsi(tf)) &amp;gt; 6
 	and ttd(t)&amp;gt;=18
 then 
 	cast(gsi(ber)) 
-end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Faerie Fire</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if cd(ff)==0 and sir(gsi(ff),t)==1 then
+end
+
+if incom
+	and GetItemCount(76089,false,false) &amp;gt; 0 
+	and ( select(2, GetItemCooldown(76089)) == 0 ) 
+	and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto)
+	and ((thp &amp;lt; 30 and ubid(p,ber)) or ttd(t)&amp;lt;=40)
+then
+   UseItemByName(GetSpellInfo(76089))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Faerie Fire</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if cd(ff)==0 and sir(gsi(mgl),t)==1 and thp &amp;gt; 25 then
 	if incom or (outcom and select(2,IsInInstance())==&amp;quot;none&amp;quot;) then 
 		if not udbid(t,wa) and not ubid(p,prl) then 
 			if war==0 or wac &amp;lt; 3 then
@@ -490,67 +516,24 @@ end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False
 			end
 		end
 	end
-end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Ferocious Bite</Name><Default>false</Default><SpellID>22568</SpellID><Actions></Actions><Lua>if ubid(p,cf) and check(fb) and pow&amp;gt;=25 and not HaveBuff(p,{139121,139117,139120}) and rscbuff&amp;lt;=5 then
-	if thp &amp;gt; 25 and srr &amp;gt; 3  and cp==5 then
-		if bossID == 63053 then
-			cast(gsi(fb))
-		end
-		if pow&amp;gt;=50 and rpr &amp;gt; 8 and (docbuff==0 or (docbuff==2 and rkp &amp;lt; 108) or (docbuff==1 and rpp &amp;lt; 108)) then
-			cast(gsi(fb))
-		end
-		if ((srr &amp;lt;= 3 and rpr &amp;gt; 0) or ttd(t) &amp;lt; 15) then
-			cast(gsi(fb))
-		end
-	end
-	if thp &amp;lt;= 25 and rpr &amp;gt; 0 then
-		if cp==5 and pow&amp;gt;=50 and srr &amp;gt; 3 then
-			cast(gsi(fb))
-		end
-		if cp&amp;gt;=1 and rpr &amp;gt; 0 and rpr&amp;lt;=3 then
-			cast(gsi(fb))
-		end
-	end
-	if pow&amp;gt;=50 and cp==5 and srr&amp;lt;=4 and rpr &amp;gt; 8 then
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Ferocious Bite</Name><Default>false</Default><SpellID>22568</SpellID><Actions></Actions><Lua>if ubid(p,cf) 
+	and check(fb)
+	and pow&amp;gt;=25
+	and not HaveBuff(p,{139121,139117,139120})
+	and srr &amp;gt; 0
+then
+	if thp&amp;lt;=25 and ((rpr &amp;gt; 0 and rpr&amp;lt;=4) or ttd(t)&amp;lt;=4) then
 		cast(gsi(fb))
+	else
+		if rpp &amp;lt; 108 
+			and rpr &amp;gt; 6
+			and cp&amp;gt;=5 
+			and pow&amp;gt;=50 	
+		then
+			cast(gsi(fb))
+		end
 	end
-	if pow&amp;gt;=25 and cp==5 and srr&amp;lt;=3 and rpr &amp;gt; 8 then
-		cast(gsi(fb))
-	end
-	if pow&amp;gt;=25 and cp&amp;gt;=3 and ttd(t)&amp;lt;=5 then
-		cast(gsi(fb))
-	end
-end
---if ubid(p,cf) and check(fb) and pow&amp;gt;=25 then
---	if cp &amp;gt; 0 and rpr &amp;gt; 0 and rpr&amp;lt;=3 and thp&amp;lt;=25 then
---		cast(gsi(fb))
---	end
---	if ttd(t)&amp;lt;=1 and cp&amp;gt;=3 then
---		cast(gsi(fb))
---	end
---	if cp&amp;gt;=5 and rpr &amp;gt; 0 and thp&amp;lt;=25 then
---		cast(gsi(fb))
---	end
---	if cp&amp;gt;=5 and rpr &amp;gt; 0 and not ((rpr - 2) &amp;lt;= (tmp - 1)) and not ((srr - 3) &amp;lt;= (tmp - 1)) then
---		cast(gsi(fb))
---	end
---end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Healing Touch</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and plvl&amp;gt;=26 then
---	if ubid(p,ps) and cp&amp;gt;=4 then
---		if members[1].HP &amp;lt; php and not udbid(members[1].Unit, 137341, nil) and not LineOfSight(members[1].Unit) then
---			PQR_CustomTarget = members[1].Unit
---			cast(gsi(ht),PQR_CustomTarget)
---		else
---			cast(gsi(ht),p)
---		end
---	end
---	if ubid(p,ps) and psr&amp;lt;=1.5 then
---		if members[1].HP &amp;lt; php and not udbid(members[1].Unit, 137341, nil) and not LineOfSight(members[1].Unit) then
---			PQR_CustomTarget = members[1].Unit
---			cast(gsi(ht),PQR_CustomTarget)
---		else
---			cast(gsi(ht),p)
---		end
---	end
-	
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Healing Touch</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and plvl&amp;gt;=26 then
 	if TalentCheck(dcd) and ubid(p,ps) and not ubid(p,dcd) and (psr &amp;lt; 1.5 or cp&amp;gt;=4) then
 		if members[1].HP &amp;lt; php and not udbid(members[1].Unit, 137341, nil) and not LineOfSight(members[1].Unit) then
 			PQR_CustomTarget = members[1].Unit
@@ -560,7 +543,7 @@ end
 		end
 	end
 end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Forms</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if not (pcasting or pchannel) and not ubid(p,how) then
-	if (incom or IsOutdoors()==nil) and not ubid(p,cf) and not ubid(p,bf) and not (IsMounted() or ubid(p,sff)) then 
+	if (incom or IsOutdoors()==nil) and not ubid(p,cf) and not (IsMounted() or ubid(p,sff)) then 
 		cast(gsi(cf),nil)
 	end
 	if outcom and not ubid(p,cf) and IsSwimming()~=nil and not ubid(p,af) then 
@@ -586,56 +569,52 @@ if incom and cd(ty)==0 and Interruptable(t,ty) then
 end
 if incom and check(ma) and cd(sb)~=0 and Interruptable(t,ma) and cp &amp;gt; 0 and pow&amp;gt;=35 and (select(2,GetInstanceInfo())==&amp;quot;arena&amp;quot; or select(2,GetInstanceInfo())==&amp;quot;pvp&amp;quot;) then
 	cast(gsi(ma),t)
-end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Prowl</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if outcom and not IsStealthed() and canattack and ubid(p,cf) and check(prl) then 
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Prowl</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if outcom and AOEMode==0 and not IsStealthed() and canattack and ubid(p,cf) and check(prl) then 
 	cast(gsi(prl)) 
-end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Rake</Name><Default>false</Default><SpellID>1822</SpellID><Actions></Actions><Lua>if ubid(p,cf) and check(rk) and (srr &amp;gt; 1 or srg==false) and pow&amp;gt;=35 then 
-	if HaveBuff(p,{139121,139117,139120}) and cp &amp;lt; 5 then
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Rake</Name><Default>false</Default><SpellID>1822</SpellID><Actions></Actions><Lua>if ubid(p,cf) and check(rk) and sir(gsi(mgl),t)==1 and (srr &amp;gt; 1 or srg==false) and pow&amp;gt;=35 then 
+	if rrr &amp;gt; 0.5 and rkr &amp;lt; 9 and rrr&amp;lt;=1.5 then
 		cast(gsi(rk))
  	end
- 	if rkr &amp;lt; 3 or (rkp &amp;gt; 108 and (rscbuff==0 or rscbuff&amp;gt;=9)) then
+ 	if rkr &amp;lt; 3 then
   		cast(gsi(rk))
  	end
-end
-
---if ubid(p,cf) and check(rk) and (srr &amp;gt; 1 or srg==false) and pow&amp;gt;=35 and (rscbuff==0 or rscbuff&amp;gt;=9 or rkr &amp;lt; 3) then 
---	if ((crkd &amp;gt; mgld and crkd &amp;gt;=rkd) 
---		or (HaveBuff(p,{139121,139117,139120}) and rkr&amp;lt;9 and rrr &amp;lt;= 1.5) 
---		or ((ttd(t) - rkr) &amp;gt; 3 and (crkd &amp;gt; rkd or rkr &amp;lt; 3)))
---	then
---		cast(gsi(rk))
---	end
---end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Ravage</Name><Default>false</Default><SpellID>6785</SpellID><Actions></Actions><Lua>if not IsLeftAltKeyDown() 
+ 	if (ttd(t)-rkr) &amp;gt; 3 and (crkd &amp;gt; rkd or (rkr &amp;lt; 3 and rkp&amp;gt;=75)) then
+		cast(gsi(rk))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Ravage</Name><Default>false</Default><SpellID>6785</SpellID><Actions></Actions><Lua>if not IsLeftAltKeyDown() 
 and not SpellIsTargeting()
 and not UnitChannelInfo(p) 
 and not UnitIsDeadOrGhost(p) 
-and IsStealthed()
 and (srr &amp;gt; 1 or srg==false)
 and sir(gsi(mgl),t)==1
 and ubid(p,cf)
 then
-	if plvl &amp;gt;= 32 and UnitIsPVP(p) ~= nil and behind==false and pow&amp;gt;=50 then
-		cast(gsi(pnc))
-	elseif plvl &amp;lt; 54 or srg==false or behind==false and pow&amp;gt;=35 then
-		cast(gsi(mgl))
-	elseif pow&amp;gt;=45 then
-		cast(gsi(rvg))
+	if ubid(p,spd) then
+		cast(gsi(rvf))
+	elseif IsStealthed() then
+		if plvl &amp;gt;= 32 and UnitIsPVP(p) ~= nil and behind==false and pow&amp;gt;=50 then
+			cast(gsi(pnc))
+		elseif (plvl &amp;lt; 54 or srg==false or behind==false) and pow&amp;gt;=35 then
+			cast(gsi(mgl))
+		elseif pow&amp;gt;=45 then
+			cast(gsi(rvg))
+		end
 	end
-end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Rip</Name><Default>false</Default><SpellID>1079</SpellID><Actions></Actions><Lua>if ubid(p,cf) and check(rp) and pow&amp;gt;=30 and cp==5 and srr &amp;gt; 1 and bossID~=63053 and ttd(t)&amp;gt;=15 then
-	if HaveBuff(p,{139121,139117,139120}) then
-		cast(gsi(rp))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Rip</Name><Default>false</Default><SpellID>1079</SpellID><Actions></Actions><Lua>if ubid(p,cf) and check(rp) and pow&amp;gt;=30 and srr &amp;gt; 1 and bossID~=63053 and ttd(t) &amp;gt; 4 then
+	if cp&amp;gt;=4 then
+		if rpp&amp;gt;=95 and ttd(t) &amp;gt; 30 and rrr &amp;gt; 0 and rrr&amp;lt;=11.5 then
+			cast(gsi(rp))
+		end
 	end
-	if rpr &amp;lt; 6 or (rpp &amp;gt; 108 and (rscbuff==0 or rscbuff&amp;gt;=7)) then
-		cast(gsi(rp))
+	if cp&amp;gt;=5 then
+		if rpr == 0 then
+			cast(gsi(rp))
+		end
+		if (rpr &amp;lt; 6 and thp &amp;gt; 25) or (rpp &amp;gt; 108 and (rscbuff==0 or rscbuff&amp;gt;=7)) and ttd(t)&amp;gt;=15 then
+			cast(gsi(rp))
+		end
 	end
-end
-
---if ubid(p,cf) and check(rp) and pow&amp;gt;=30 and srr &amp;gt; 1 and bossID~=63053 then
---	if ((cp&amp;gt;=5 and (crpd/rpd)&amp;gt;=1.15 and ttd(t) &amp;gt; 30) 
---		or (cp&amp;gt;=5 and ttd(t)&amp;gt;=6 and rpr &amp;lt; 2 and (ubid(p,ber) or rpr+1.9 &amp;lt;= cd(tf))))
---	then
---		cast(gsi(rp))
---	end
---end</Lua><RecastDelay>1000</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Savage Roar</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if ubid(p,cf) then
+end</Lua><RecastDelay>1000</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Savage Roar</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if ubid(p,cf) then
 	if cp&amp;gt;=1 and rpr &amp;gt; 0 and rpr&amp;lt;=3 and thp&amp;lt;=25 then
 		return false
 	else
@@ -649,147 +628,107 @@ end
 			end
 		end
 	end
---	if (IsStealthed() or incom) then
---		if srr==0 and (svg==true or cp &amp;gt; 0) then
---			cast(gsi(sr))
---		end
---		if srr&amp;lt;=3 and (svg==true or cp &amp;gt; 0) and thp &amp;lt; 25 then
---			cast(gsi(sr))
---		end
---		if srr&amp;lt;=3 and (svg==true or cp &amp;gt; 0) and (srr + 2) &amp;gt; rpr then
---			cast(gsi(sr))
---		end
---		if srr&amp;lt;=6 and cp&amp;gt;=5 and (srr + 2) &amp;lt;= rpr then
---			cast(gsi(sr))
---		end
---	end
-end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Shred</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if ubid(p,cf) and AOEMode==0 and rkr &amp;gt; 3 and cp &amp;lt; 5 and not HaveBuff(p,{139121,139117,139120}) then
-	if ubid(p,inb) and pow&amp;gt;=45 then
-		cast(gsi(rvf))
-	end
-	if ubid(p,81022,&amp;quot;EXACT&amp;quot;) then
-		cast(gsi(rvf))
-	end
-	if tmp&amp;gt;=1 or (pow&amp;gt;=35 and not ubid(p,inc) and not ubid(p,81022,&amp;quot;EXACT&amp;quot;)) then
-		if t15count &amp;gt;= 2 then
-			if ubid(p,ber) then
-				if srg==true and pow&amp;gt;=45 then
-					cast(gsi(srf))
-				else
-					if behind == false then
-						if check(rk) and (ttd(t) - rkr) &amp;gt; 3 and ((crkd * (rkd + 1)) - (rkd * (rkr / 3))) &amp;gt; mgld then
-							cast(gsi(rk))
-						else
-							cast(gsi(mgl))
-						end
-					else
-						if pow&amp;gt;=45 and behind == true then
-							cast(gsi(shr))
-						end
-					end
-				end
-			else
-				if check(rk) and (ttd(t) - rkr) &amp;gt; 3 and ((crkd * (rkd + 1)) - (rkd * (rkr / 3))) &amp;gt; mgld then
-					cast(gsi(rk))
-				else
-					cast(gsi(mgl))
-				end
-			end
-		else
-			if (ubid(p,ber) or ubid(p,tf)) then
-				if srg==true and pow&amp;gt;=45 then
-					cast(gsi(srf))
-				else
-					if behind == false or plvl &amp;lt; 16 then
-						if check(rk) and (ttd(t) - rkr) &amp;gt; 3 and ((crkd * (rkd + 1)) - (rkd * (rkr / 3))) &amp;gt; mgld then
-							cast(gsi(rk))
-						else
-							cast(gsi(mgl))
-						end
-					else
-						if pow&amp;gt;=45 and behind == true then
-							cast(gsi(shr))
-						end
-					end
-				end
-			else
-				if behind == false or plvl &amp;lt; 16 then
-					if check(rk) and (ttd(t) - rkr) &amp;gt; 3 and ((crkd * (rkd + 1)) - (rkd * (rkr / 3))) &amp;gt; mgld then
-						cast(gsi(rk))
-					else
-						cast(gsi(mgl))
-					end
-				else
-					if pow&amp;gt;=45 and behind == true then
-						cast(gsi(shr))
-					end
-				end
-			end
-		end
+end
 
---		if (ttd(t) - rkr) &amp;gt; 3 and (crkd*((rkr/3)+1)-rkd*(rkr/3)) &amp;gt; mgld then
---			cast(gsi(rk))
---		else
---			if ((ubid(p,cc) or pow&amp;gt;=45) or ubid(p,ber) or repow&amp;gt;=15) and ((behind==true and t15count &amp;lt; 2) or ((ubid(p,tf) or ubid(p,ber)) and srg==true)) then
---				cast(gsi(shr))
+------ADD IN SAVAGE ROAR----------
+if ubid(p,141857) and not ubid(p,143373) and ((IsPlayerSpell(124974) and PQR_SpellAvailable(124974)) or not IsPlayerSpell(124974)) and PQR_SpellAvailable(143373) then
+	if cp&amp;gt;4 and srr&amp;lt;30 then
+	cast(gsi(sr))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Shred</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>--if ubid(p,cf) and AOEMode==0 and rkr &amp;gt; 3 and cp &amp;lt; 5 and not HaveBuff(p,{139121,139117,139120}) and sir(gsi(mgl),t)==1 then
+--	if ubid(p,inb) and pow&amp;gt;=45 then
+--		cast(gsi(rvf))
+--	end
+--	if ubid(p,81022,&amp;quot;EXACT&amp;quot;) then
+--		cast(gsi(rvf))
+--	end
+--	if tmp&amp;gt;=1 or (pow&amp;gt;=35 and not ubid(p,inc) and not ubid(p,81022,&amp;quot;EXACT&amp;quot;)) then
+--		if t15count &amp;gt;= 2 then
+--			if ubid(p,ber) then
+--				if srg==true and pow&amp;gt;=45 then
+--					cast(gsi(srf))
+--				else
+--					if behind == false then
+--						if check(rk) and (ttd(t) - rkr) &amp;gt; 3 and ((crkd * (rkd + 1)) - (rkd * (rkr / 3))) &amp;gt; mgld then
+--							cast(gsi(rk))
+--						else
+--							cast(gsi(mgl))
+--						end
+--					else
+--						if pow&amp;gt;=45 and behind == true then
+--							cast(gsi(shr))
+--						end
+--					end
+--				end
 --			else
---				if pow&amp;gt;=35 then
+--				if check(rk) and (ttd(t) - rkr) &amp;gt; 3 and ((crkd * (rkd + 1)) - (rkd * (rkr / 3))) &amp;gt; mgld then
+--					cast(gsi(rk))
+--				else
 --					cast(gsi(mgl))
 --				end
 --			end
---		end
-	end
-end
-		
---if ubid(p,cf) and AOEMode==0 then
---	if ubid(p,cc)
---		or ((cp &amp;lt; 5 and rpr &amp;lt; 3) or ((cp==0 or svg==true) and srr &amp;lt; 2))
---		or ttd(t)&amp;lt;=8.5
---		or ((ubid(p,tf) or ubid(p,ber) or ubid(p,nv)) and cd &amp;lt; 5)
---		or cd(tf)&amp;lt;=3
---		or tmp&amp;lt;=1
---	then
---		if ubid(p,inc) and pow&amp;gt;=45 then
---			cast(gsi(rvf))
 --		else
---			if (ttd(t) - rkr) &amp;gt; 3 and (crkd*((rkr/3)+1)-rkd*(rkr/3)) &amp;gt; mgld then
---				cast(gsi(rk))
---			else
---				if ((ubid(p,cc) or pow&amp;gt;=45) or ubid(p,ber) or repow&amp;gt;=15) and (behind==true or ((ubid(p,tf) or ubid(p,ber)) and srg==true)) then
---					cast(gsi(shr))
+--			if (ubid(p,ber) or ubid(p,tf)) then
+--				if srg==true and pow&amp;gt;=45 then
+--					cast(gsi(srf))
 --				else
---					if pow&amp;gt;=35 then
+--					if behind == false or plvl &amp;lt; 16 then
+--						if check(rk) and (ttd(t) - rkr) &amp;gt; 3 and ((crkd * (rkd + 1)) - (rkd * (rkr / 3))) &amp;gt; mgld then
+--							cast(gsi(rk))
+--						else
+--							cast(gsi(mgl))
+--						end
+--					else
+--						if pow&amp;gt;=45 and behind == true then
+--							cast(gsi(shr))
+--						end
+--					end
+--				end
+--			else
+--				if behind == false or plvl &amp;lt; 16 then
+--					if check(rk) and (ttd(t) - rkr) &amp;gt; 3 and ((crkd * (rkd + 1)) - (rkd * (rkr / 3))) &amp;gt; mgld then
+--						cast(gsi(rk))
+--					else
 --						cast(gsi(mgl))
+--					end
+--				else
+--					if pow&amp;gt;=45 and behind == true then
+--						cast(gsi(shr))
 --					end
 --				end
 --			end
 --		end
 --	end
---end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Thrash</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>local bossID = tonumber(UnitGUID(t):sub(-13, -9), 16)
+--end
+
+if ubid(p,cf) and AOEMode==0 and incom and not IsStealthed() and sir(gsi(mgl),t)==1 and cp &amp;lt; 5 then
+	if (ubid(p,inb) and pow&amp;gt;=45) or ubid(p,spd) then
+		cast(gsi(rvf))
+	elseif check(rk) and (ttd(t) - rkr) &amp;gt; 3 and ((crkd * (rkr + 1)) - (rkd * rkr)) &amp;gt; mgld then
+		cast(gsi(rk))
+	elseif check(shr) and canshr==true and (ubid(p,ber) or ubid(p,cc) or repow&amp;gt;=15) and pow&amp;gt;=45 and not ubid(p,inb) then
+		cast(gsi(shr))
+	elseif check(mgl) and pow&amp;gt;=35 and not ubid(p,inc) then
+		cast(gsi(mgl))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Thrash</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>local bossID = tonumber(UnitGUID(t):sub(-13, -9), 16)
 if incom 
 	and ubid(p,cf)
 	and plvl &amp;gt;= 28 
-	and pow&amp;gt;=50 --Clearcasting Buff / Power Check
-	--and srr &amp;gt; 3 --Savage Roar Active
-	--and rkr &amp;gt; 3 --Rake Active
-	and rpr &amp;gt; 3 --Rip Active
-	and thrr&amp;lt;=3 --Thrash about to fall off or not present
+	and pow&amp;gt;=50 
 	and sir(gsi(mgl),t)==1 --In Range
 	and ttd(t)&amp;gt;=6
-	and not (HaveBuff(p,{139121,139117,139120}))
 	and bossID ~= (69700 or 69701)
 then
-	cast(gsi(thr)) --Apply Thrash
+	if thrr &amp;lt; 9 and rrr &amp;gt; 0 and rrr&amp;lt;=1.5 and rpr &amp;gt; 0 then
+		cast(gsi(thr))	
+	elseif thrr&amp;lt;=3 and rpr &amp;gt; 3 and rkr &amp;gt; 3 then
+		cast(gsi(thr)) --Apply Thrash
+	end
 end
 if incom and ubid(p,bf) and cd(thb)==0 then
 	cast(gsi(thb))
-end
-
---if incom and ubid(p,cf) and plvl&amp;gt;=28 and pow&amp;gt;=50 then
---	if ttd(t)&amp;gt;=6 and thrr &amp;lt; 3 and (rpr&amp;gt;=4 or ubid(p,ber)) and rpr &amp;gt; 0 then
---		cast(gsi(thr))
---	end
---end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Tiger&amp;apos;s Fury</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and ubid(p,cf) and pow &amp;lt;= 35 and cd(tf)==0 and sir(gsi(mgl),t)==1 and not ubid(p,ber) and not ubid(p,cc) then
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Tiger&amp;apos;s Fury</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and ubid(p,cf) and pow &amp;lt;= 35 and cd(tf)==0 and sir(gsi(mgl),t)==1 and not ubid(p,ber) and not ubid(p,cc) then
 	cast(gsi(tf)) 
 end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Swipe</Name><Default>false</Default><SpellID>0</SpellID><Actions>/startattack</Actions><Lua>if ubid(p,cf) and AOEMode~=0 and incom and pow&amp;gt;=45 and (thrr &amp;gt; 0 or AOEMode==1) and sir(gsi(mgl),t)==1 then 
 	if AOEMode==1 and rkr &amp;gt; 3 and cp &amp;lt; 5 then
@@ -814,14 +753,7 @@ or UnitDebuffID(&amp;quot;player&amp;quot;,135147) --Dead Zone - Iron Qon: Dam&a
 or UnitBuffID(&amp;quot;target&amp;quot;,143593) --Defensive Stance - General Nagrazim
 or UnitBuffID(&amp;quot;target&amp;quot;,140296) --Conductive Shirld - Thunder Lord / Lightning Guardian
 or not UnitAffectingCombat(&amp;quot;Player&amp;quot;)
-then return true end
-
---if cp&amp;gt;=5 and thp&amp;lt;=25 and rpr &amp;gt; 0 and not (pow&amp;gt;=50 or (ubid(p,ber) and pow&amp;gt;=25)) then
---	return true
---end
---if cp&amp;gt;=5 and not (pow&amp;gt;=50 or (ubid(p,ber) and pow&amp;gt;=25)) and rpr &amp;gt; 0 and not ((rpr - 2) &amp;lt;= (tmp - 1)) and not ((srr - 3) &amp;lt;= (tmp - 1)) then
---	return true
---end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Defensive</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and not ubid(p,prl) then
+then return true end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Defensive</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and not ubid(p,prl) then
 	if php&amp;lt;=50 and check(bar) then
 		cast(gsi(bar))
 	end
@@ -838,6 +770,10 @@ then return true end
 	if ubid(p,mu) and check(fr) then
 		cast(gsi(fr))
 		cast(gsi(cf),nil)
+	end
+	-- Health Potion
+	if php &amp;lt; 25 and CanHealPot() then
+		UseItemByName(drinkme)
 	end
 end
 if UnitExists(&amp;quot;mouseover&amp;quot;) 
@@ -879,7 +815,7 @@ end
 
 if incom and GetInventoryItemCooldown(p,10) == 0 and ubid(p,tf) and not ubid(p, ber) then
 	UseInventoryItem(10)
-end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Symbiosis</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl &amp;gt;= 68 and outcom and SymMode==0 and select(2,IsInInstance())~=&amp;quot;none&amp;quot; then
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Symbiosis</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl &amp;gt;= 87 and outcom and SymMode==0 and select(2,IsInInstance())~=&amp;quot;none&amp;quot; then
 	if not ubid(p,sym) and cd(sym)==0 then
 		if PQR_CustomTarget ~= symmem[1].Unit then
 			PQR_CustomTarget = symmem[1].Unit
@@ -1083,12 +1019,12 @@ local configferalhp = {
     },
     }
     
-CuteOneFeral = PQI:AddRotation(configferalhp)</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Remove Corruption</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>--if ValidDispel(p) and cd(rc)==0 and not and cp &amp;gt; 0 and pow&amp;gt;=35 and select(2,GetInstanceInfo())~=&amp;quot;arena&amp;quot; and select(2,GetInstanceInfo())~=&amp;quot;pvp&amp;quot; then
---	cast(gsi(rc),p)
---end
---if ValidDispel(&amp;quot;mouseover&amp;quot;) and cd(rc)==0 then
---	cast(gsi(rc),&amp;quot;mouseover&amp;quot;)
---end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Single Override</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if AOEMode == 0 then
+CuteOneFeral = PQI:AddRotation(configferalhp)</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Remove Corruption</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if ValidDispel(p) and cd(rc)==0 and cp &amp;gt; 0 and pow&amp;gt;=35 and ((select(2,GetInstanceInfo())~=&amp;quot;arena&amp;quot; and select(2,GetInstanceInfo())~=&amp;quot;pvp&amp;quot;) or outcom) then
+	cast(gsi(rc),p)
+end
+if ValidDispel(&amp;quot;mouseover&amp;quot;) and cd(rc)==0 then
+	cast(gsi(rc),&amp;quot;mouseover&amp;quot;)
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Single Override</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if AOEMode == 0 then
 	rotchange = 1
 end
 if AOEMode ~= 0 and rotchange==0 then
@@ -1112,53 +1048,9 @@ if AOEMode ~= 2 and rotchange==0 then
 	rotchange = 1
 end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Cyclone</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if UnitExists(&amp;quot;focus&amp;quot;) and sir(gsi(cy),&amp;quot;focus&amp;quot;)==1 and cd(cy)==0 then
 	cast(gsi(cy),&amp;quot;focus&amp;quot;)
-end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Clearcasting</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and ubid(p,cc) and sir(gsi(mgl),t)==1 and ubid(p,cf) then
-	if check(rp) and cp==5 and (rpr &amp;lt; 6 or (rpp &amp;gt; 108 and (rscbuff==0 or rscbuff&amp;gt;=7))) then
-		cast(gsi(rp))
-	elseif plvl&amp;gt;=28 and thrr &amp;lt; 3 and ttd(t)&amp;gt;=6 then
-		cast(gsi(thr))
-	elseif check(rk) and (rkr &amp;lt; 3 or ((ttd(t) - rkr) &amp;gt; 3 and ((crkd * (rkd + 1)) - (rkd * (rkr / 3))) &amp;gt; mgld)) then
-		cast(gsi(rk))
-	elseif cp&amp;lt;=5 then
-		if AOEMode==0 then
-			if behind==true then
-				cast(gsi(shr))
-			else
-				cast(gsi(mgl))
-			end
-		else
-			cast(gsi(sw))
-		end
-	end
-end
---if incom and ubid(p,cc) and ubid(p,bf) then
---	if thrr&amp;lt;=3 and cd(thb)==0 then
---		cast(gsi(thb))
---	elseif pow &amp;gt; 50 and cd(ml)==0 then
---		cast(gsi(ml))
---	elseif
---		cast(gsi(swb))
---	end
---end
-
---if incom and ubid(p,cc) and sir(gsi(mgl),t)==1 and ubid(p,cf) then
---	if plvl&amp;gt;=28 and thrr &amp;lt; 3 and ttd(t)&amp;gt;=6 then
---		cast(gsi(thr))
---	else
---		if (ttd(t) - rkr) &amp;gt; 3 and (crkd*((rkr/3)+1)-rkd*(rkr/3)) &amp;gt; mgld then
---			cast(gsi(rk))
---		else
---			if ((ubid(p,cc) or pow&amp;gt;=45) or ubid(p,ber) or repow&amp;gt;=15) and (behind==true or ((ubid(p,tf) or ubid(p,ber)) and srg==true)) then
---				cast(gsi(shr))
---			else
---				if pow&amp;gt;=35 then
---					cast(gsi(mgl))
---				end
---			end
---		end
---	end
---end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Rejuvination</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if not IsLeftAltKeyDown() 
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Rejuvination</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if not IsLeftAltKeyDown() 
 and not IsMounted()
+and not IsStealthed()
 and not SpellIsTargeting()
 and not UnitBuffID(&amp;quot;Player&amp;quot;,80169)
 and not UnitBuffID(&amp;quot;Player&amp;quot;,87959)
@@ -1597,12 +1489,13 @@ end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False
 				CastSpellByName(GetSpellInfo(spell))
 		end
 	end
-end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Tier 4</Name><Default>false</Default><SpellID>106737</SpellID><Actions></Actions><Lua>-- Incarnation: King of the Jungle
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Tier 4</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>-- Incarnation: King of the Jungle
 if incom 
 	and not ubid(p,prl) 
 	and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto)
 	and ubid(p,ber)
-	and check(inc) 
+	and TalentCheck(inc) 
+	and check(inb)
 	and ubid(p,sr) 
 	and ubid(p,tf) 
 	and sir(gsi(mgl),t)==1 
@@ -1614,11 +1507,14 @@ end
 --Force of Nature
 local fonchrg = GetSpellCharges(fon)	--Force of Nature Charges
 if incom
+	and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto)
 	and not ubid(p,prl) 
-	--and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto)
 	and cd(fon)==0
 	and sir(gsi(mgl),t)==1
 then
+	if ((dex &amp;gt; 0 and dex&amp;lt;=1) or ubid(p,146310)) and fonchrg &amp;gt; 0 then
+		cast(gsi(fon))
+	end
 	if fonchrg == 3 and rrr==0 and rscr==0 and Nova_CheckLastCast(fon,1) then
 		cast(gsi(fon)) 
 	end
@@ -1628,7 +1524,7 @@ then
 	if ttd(t) &amp;lt; 20 and fonchrg &amp;gt; 0 then
 		cast(gsi(fon))
 	end
-end</Lua><RecastDelay>10000</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Tier 6</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>-- Heart of the Wild
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Tier 6</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>-- Heart of the Wild
 if ubid(p,how) then
 	if check(mf) and not udbid(t,mf) then
 		cast(gsi(mf))
@@ -1638,7 +1534,32 @@ if ubid(p,how) then
 end
 
 -- Nature&amp;apos;s Vigil
-if incom 
+--if incom 
+--	and not ubid(p,prl) 
+--	and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto)
+--	and pow&amp;gt;=75 
+--	and check(nv) 
+--	and ubid(p,sr) 
+--	and ubid(p,tf) 
+--	and sir(gsi(mgl),t)==1 
+--	and ttd(t)&amp;gt;=15 
+--then 
+--	cast(gsi(nv)) 
+--end
+-------------------REPLACE NATURES VIGIL----------
+
+
+if UnitExists(&amp;quot;boss&amp;quot;..1) then
+local npcID = tonumber(UnitGUID(&amp;quot;boss&amp;quot;..1):sub(6,10), 16)	
+	if npcID == 71161 or npcID == 71157 or npcID == 71156 or npcID == 71155 or npcID == 71160 or npcID == 71154 or npcID == 71152 or npcID == 71158 or npcID == 71153 then 
+		if check(nv) then
+			if ubid(p,141857) and not ubid(p,143373) and PQR_SpellAvailable(143373) then
+				if srr&amp;gt;=30 then
+				cast(gsi(nv)) 
+				end
+			end
+		end
+	elseif incom 
 	and not ubid(p,prl) 
 	and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto)
 	and pow&amp;gt;=75 
@@ -1646,7 +1567,35 @@ if incom
 	and ubid(p,sr) 
 	and ubid(p,tf) 
 	and sir(gsi(mgl),t)==1 
-	and ttd(t)&amp;gt;=15 
-then 
+	and ttd(t)&amp;gt;=15 then 
 	cast(gsi(nv)) 
-end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability></DRUID>
+	end
+elseif incom 
+and not ubid(p,prl) 
+and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto)
+and pow&amp;gt;=75 
+and check(nv) 
+and ubid(p,sr) 
+and ubid(p,tf) 
+and sir(gsi(mgl),t)==1 
+and ttd(t)&amp;gt;=15 then 
+cast(gsi(nv)) 
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Paragons</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>----ADD INTO BOSS FUNCTIONS OR CREATE ITS OWN FILE, MAKE SURE CANCEL CHANNEL IS *TRUE*---
+
+if ubid(p,141857) and not ubid(p,143373) and ((IsPlayerSpell(124974) and ubid(p,124974)) or not IsPlayerSpell(124974)) then
+	if PQR_SpellAvailable(143373) then
+	RunMacroText(&amp;quot;/click ExtraActionButton1&amp;quot;)
+	end
+end
+
+if ubid(p,143373) then
+	if UnitDebuffID(&amp;quot;target&amp;quot;,144276) and PQR_SpellAvailable(144275) then
+	RunMacroText(&amp;quot;/click OverrideActionBarButton2&amp;quot;)
+	elseif not UnitDebuffID(&amp;quot;target&amp;quot;,144276) and PQR_SpellAvailable(144276) then
+	RunMacroText(&amp;quot;/click OverrideActionBarButton3&amp;quot;)
+	elseif PQR_SpellAvailable(144274) then
+	RunMacroText(&amp;quot;/click OverrideActionBarButton1&amp;quot;)
+	elseif PQR_SpellAvailable(144181) then
+	RunMacroText(&amp;quot;/click OverrideActionBarButton4&amp;quot;)
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>True</CancelChannel><SkipUnknown>True</SkipUnknown></Ability></DRUID>

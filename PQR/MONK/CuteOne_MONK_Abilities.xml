@@ -43,6 +43,7 @@ lwt	=	116781	--Legacy of the White Tiger
 nmb	=	137562	--Nimble Brew
 par	=	115078	--Paralysis
 pro	=	115546	--Provoke
+qpm	=	107079	--Quaking Palm
 res	=	115178	--Resuscitate
 rol	=	109132	--Roll
 rsk	=	107428	--Raising Sun Kick
@@ -212,7 +213,7 @@ end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False
 		if plvl &amp;lt; 3 then
 			cast(gsi(jab))
 		end
-		if chi &amp;lt;= 2 and (php&amp;gt;=80 or cd(exh)~=0) then
+		if chi &amp;lt;= 2 and (plvl &amp;lt; 26 or php&amp;gt;=80 or cd(exh)~=0) then
 			cast(gsi(jab))
 		end
 	end
@@ -268,10 +269,11 @@ end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False
 end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Fists of Fury</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=10 then
 	if incom 
 		and cd(fof)==0 
+		and cd(rsk)&amp;gt;=2
 		and sir(gsi(jab),t)==1 
-		--and pow&amp;lt;=30 
+		and pow&amp;lt;=30 
 		and death==false 
-		and chi&amp;gt;=3 
+		--and chi&amp;gt;=3 
 		and tpr &amp;gt; 4 
 		and tmp &amp;gt; 4 --ffh 
 		and not ubid(p,enb)
@@ -349,7 +351,10 @@ then return true end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><Ca
 	    if not HaveBuff(members[i].Unit,{115921,20217,1126,90363}) and (#members==select(5,GetInstanceInfo()) or select(2,IsInInstance())==&amp;quot;none&amp;quot;)
 	    then return true end
 	end
-end</Lua><RecastDelay>1000</RecastDelay><Target>Player</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Interrupts</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=32 then
+end</Lua><RecastDelay>1000</RecastDelay><Target>Player</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Interrupts</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and check(qpm) and Interruptable(t,qpm) then
+	cast(gsi(qpm),t)
+end
+if plvl&amp;gt;=32 then
 	if incom and check(shs) and Interruptable(t,shs) then
 		cast(gsi(shs),t) 
 	end

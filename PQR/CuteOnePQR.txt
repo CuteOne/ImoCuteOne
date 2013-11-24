@@ -10,23 +10,23 @@
 
 ----DRUID
 --FERAL
-http://dl.dropbox.com/s/d1ed5cpyf27recg/CuteOne_DRUID_Abilities.xml
-http://dl.dropbox.com/s/qiqnbwie0o238wz/CuteOne_DRUID_Rotations.xml
+https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/DRUID/CuteOne_DRUID_Abilities.xml
+https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/DRUID/CuteOne_DRUID_Rotations.xml
 ----SHAMAN
 --ENHANCEMENT
-http://dl.dropbox.com/s/pm5wcual1kjlwo0/CuteOne_SHAMAN_Abilities.xml
-http://dl.dropbox.com/s/6apcns7ovv9z3ps/CuteOne_SHAMAN_Rotations.xml
+https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/SHAMAN/CuteOne_SHAMAN_Abilities.xml
+https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/SHAMAN/CuteOne_SHAMAN_Rotations.xml
 ----WARRIOR
 --ARMS
-http://dl.dropbox.com/s/b076l3015ooscjw/CuteOne_WARRIOR_Abilities.xml
-http://dl.dropbox.com/s/twpxpiuy5adrd6m/CuteOne_WARRIOR_Rotations.xml
+https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/WARRIOR/CuteOne_WARRIOR_Abilities.xml
+https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/WARRIOR/CuteOne_WARRIOR_Rotations.xml
 ----ROGUE
 --ASSASSINATION
-http://dl.dropbox.com/s/xp4byncb4vomlf5/CuteOne_ROGUE_Abilities.xml
-http://dl.dropbox.com/s/exbaev370wwz5qi/CuteOne_ROGUE_Rotations.xml
+https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/ROGUE/CuteOne_ROGUE_Abilities.xml
+https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/ROGUE/CuteOne_ROGUE_Rotations.xml
 --MONK
-http://dl.dropbox.com/s/p6mqaxjww9ethst/CuteOne_MONK_Abilities.xml
-http://dl.dropbox.com/s/jpyxcynqd0oj3hb/CuteOne_MONK_Rotations.xml
+https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/MONK/CuteOne_MONK_Abilities.xml
+https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/MONK/CuteOne_MONK_Rotations.xml
 
 --DATA File
-http://dl.dropbox.com/s/96zkxw4d4a2au67/PQR_CuteOne.lua
+https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/Data/PQR_CuteOne.lua
