@@ -1,7 +1,7 @@
 ## Interface: 50400
-## Title: Probably - CuteOne-master
+## Title: Probably - ImoCuteOne-master
 ## Notes: A ProbablyEngine Custom Profile Pack
-## Author: ph34rt3hcute1 "CuteOne"
+## Author: ph34rt3hcute1 / ImogenOC
 ## Dependencies: Probably
 
 #Libs
