@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="utf-8" ?><SHAMAN><Ability><Name>Initial</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if PQR_RotationStarted == true then
+  PQR_RotationStarted = false
+  if PQR_LoadLua ~= nil
+  then
+   		if PQR_LoadLua(&amp;quot;PQR_CuteOne.lua&amp;quot;) == false
+   		then 
+      			PQR_WriteToChat(&amp;quot;Put PQR_CuteOne.lua in the data folder.&amp;quot;, &amp;quot;Error&amp;quot;)
+      			PQR_StopRotation()
+       			return true
+  		end
+  end
+end
+
+------VARIABLES------
+t = &amp;quot;target&amp;quot;
+p = &amp;quot;player&amp;quot;
+foc = &amp;quot;focus&amp;quot;
+gsi = GetSpellInfo
+cast = CastSpellByName
+cd = GetSpellCooldown
+cp = GetComboPoints(p)
+ub = UnitBuff
+ubid = UnitBuffID
+ua = UnitAura
+udb = UnitDebuff
+udbid = UnitDebuffID
+pow = UnitPower(p)
+hastar = UnitExists(t)
+canattack =  UnitCanAttack(p,t)
+sir = IsSpellInRange
+incom = UnitAffectingCombat(p)==1
+outcom = UnitAffectingCombat(p)~=1
+php = 100*(UnitHealth(p)/UnitHealthMax(p))
+thp = 100*(UnitHealth(t)/UnitHealthMax(t))
+tthp = UnitHealthMax(t)
+maxpow	=	UnitPowerMax(p)
+powper	=	100*(pow/maxpow)
+pchannel = select(8,UnitChannelInfo(p))
+pcasting = (UnitCastingInfo(p) and select(9,UnitCastingInfo(p)))
+tchannel = select(8,UnitChannelInfo(t))
+tcasting = (UnitCastingInfo(t) and select(9,UnitCastingInfo(t)))
+if select(6,UnitCastingInfo(t))~=nil then 
+	tcasttime = (select(6,UnitCastingInfo(t))/1000)-GetTime()
+else
+	tcasttime = 0
+end
+uc = UnitClassification(t)
+ul = UnitLevel
+if (ul(t)==-1 or ul(t)&amp;gt;=(ul(p)-10)) and (uc==&amp;quot;worldboss&amp;quot; or uc==&amp;quot;rareelite&amp;quot; or uc==&amp;quot;elite&amp;quot; or uc==&amp;quot;rare&amp;quot;) then
+	BossCheck = false
+else
+	BossCheck = false
+end
+
+------Abilities------
+ag	=	108281	--Ancestral Guidance
+as	=	2008	--Ancestral Spirit
+asc	=	114049	--Ascendance
+asw =	16188	--Ancestral Swiftness
+ar	=	556		--Astral Recall
+ass	=	108271	--Astral Shift
+be	=	76780	--Bind Elemental
+bf	=	33697	--Blood Fury (Orc Racial)
+ch	=	1064	--Chain Heal
+cl	=	421		--Chain Lightning
+cs	=	51886	--Cleanse Spirit
+eb	=	117014	--Elemental Blast
+em	=	16166	--Elemental Mastery	
+es	=	8042	--Earth Shock
+gon	=	59547	--Gift of the Naaru
+far	=	6196	--Far Sight
+fer =	51533	--Feral Spirit
+fn	=	1535	--Fire Nova
+fs	=	8050	--Flame Shock
+frs	=	8056	--Frost Shock
+gw	=	2645	--Ghost Wolf
+hr	=	73920	--Healing Rain
+hs	=	8004	--Healing Surge
+her	=	32182	--Heroism
+hex	=	51514	--Hex
+ll	=	60103	--Lava Lash
+lb	=	403		--Lightning Bolt
+ls	=	324		--Lightning Shield
+prg	=	370		--Purge
+sb	=	115356	--Stormblast
+sr	=	30823	--Shamanistic Rage
+sw	=	58875	--Spirit Walk
+sg	=	79206	--Spiritwalker&amp;apos;s Grace
+ss	=	17364	--Stormstrike
+tp	=	108287	--Totemic Projection
+tr	=	36936	--Totemic Recall
+ue	=	73680	--Unleash Elements
+uf	=	117012	--Unleashed Fury
+ws	=	52127	--Water Shield
+ww	=	546		--Water Walking
+wsh	=	57994	--Wind Shear
+
+		
+------Totems------
+---Air
+ct	=	108269	--Capacitor Totem
+gt	=	8177	--Grounding Totem
+st	=	120668	--Stormlash Totem
+wt	=	108273	--Windwalk Totem
+_, air = GetTotemInfo(4)
+if air == gsi(ct) or air == gsi(gt) or air == gsi(st) or air == gsi(wt) then
+	hasair = true
+	atr = GetTotemTimeLeft(4)
+else 
+	hasair = false
+	atr = 0
+end
+
+---Earth
+et	=	2484	--Earthbind Totem
+tt	=	8143	--Tremor Totem
+eet	=	2062	--Earth Elemental Totem
+_, earth = GetTotemInfo(2)
+if earth == gsi(et) or earth == gsi(tt) or earth == gsi(eet) then
+	hasearth = true
+	etr	= GetTotemTimeLeft(2)
+else 
+	hasearth = false
+	etr = 0
+end
+
+---Fire
+fet	=	2894	--Fire Elemental Totem
+mt	=	8190	--Magma Totem
+srt	=	3599	--Searing Totem
+_, fire = GetTotemInfo(1)
+if fire == gsi(fet) or fire == gsi(mt) or fire == gsi(srt) then
+	hasfire = true
+	ftr	= GetTotemTimeLeft(1)
+else 
+	hasfire = false
+	ftr = 0
+end
+
+---Water
+hst	=	5394	--Healing Stream Totem
+_, water = GetTotemInfo(3)
+if water == gsi(hst) then
+	haswater = true
+	wtr	= GetTotemTimeLeft(3)
+else
+	haswater = false
+	wtr = 0
+end
+
+------Weapon Imbues------
+local mh, mhr, _, oh, ohr = GetWeaponEnchantInfo()
+if mh==nil then
+	hasmh = false
+else
+	hasmh = true
+end
+if oh==nil then
+	hasoh = false
+else
+	hasoh = true
+end
+wfw	=	8232	--Windfury Weapon
+ftw	=	8024	--Flametongue Weapon
+fbw	=	8033	--Frostbrand Weapon
+rbw	=	8017	--Rockbiter Weapon
+
+------Buffs/Debuffs/Procs------
+ufl	=	73683	--Unleashed Flame
+mw	=	53817	--Maelstrom Weapon
+sf	=	77657	--Searing Flames
+ex	=	57723	--Exhaustion
+asb	=	114051	--Ascendance Buff
+mwstack = select(4,ubid(p,mw))
+if mwstack == nil then
+	mwc = 0
+else 
+	mwc = mwstack
+end
+
+sfstack = select(4,ubid(p,sf))
+if sfstack == nil then
+	sfc = 0
+else
+	sfc = sfstack
+end
+
+inMelee = IsSpellInRange(gsi(ll), t)
+if inMelee == nil or inMelee == 0 then
+	inMelee = false
+else
+	inMelee = true
+end
+
+fstimeer = select(4,udbid(t,fs,p))
+if fstimer == nil then
+	fsr = 0
+else
+	fsr = fstimer
+end
+
+exhausted = select(4,ubid(p,ex))
+if exhausted == nil then
+	nohero = 0
+else
+	nohero = exhausted
+end
+
+if GetSpellBookItemInfo(uf,&amp;quot;SPELL&amp;quot;)==nil then
+	hasuf = false
+else
+	hasuf = true
+end
+
+-- CD Switch
+if PQ_CDMode==nil then
+	PQ_CDMode = &amp;quot;Boss&amp;quot;
+end
+if IsRightControlKeyDown() and not GetCurrentKeyBoardFocus() and GetTime() - PQ_CDTimer &amp;gt; 1 then
+	PQ_CDTimer = GetTime()
+	
+	if not PQ_CD then
+		PQ_CD = CD_BossOnly
+		PQ_CDMode = &amp;quot;Boss&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CCooldown Mode: |cff79BAECBoss Only|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	elseif PQ_CD == CD_BossOnly then
+		PQ_CD = CD_Auto
+		PQ_CDMode = &amp;quot;On&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CCooldown Mode: |cff006400On|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	else
+		PQ_CD = false
+		PQ_CDMode = &amp;quot;Off&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CCooldown Mode: |cffDC143COff|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	end
+end
+
+-- AoE/Single Switch
+if AOEMode == nil then
+	AOEMode = 0
+end 
+if PQ_Rot == nil then
+	PQ_Rot = &amp;quot;Single&amp;quot;
+end
+
+if IsRightShiftKeyDown() and not GetCurrentKeyBoardFocus() and GetTime() - PQ_AOETimer &amp;gt; 1 then
+	PQ_AOETimer = GetTime()
+	
+	if PQ_AOE then
+		PQ_AOE = false
+		AOEMode = 0
+		PQ_Rot = &amp;quot;Single&amp;quot;
+		PQR_SwapRotation(&amp;quot;Enhance PvE (CuteOne)&amp;quot;)
+		PQR_WriteToChat(&amp;quot;|cff347C2CCooldown Mode: |cffDC143CSingle|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	elseif AOEMode==0 then
+		PQ_AOE = false
+		AOEMode = 1
+		PQ_Rot = &amp;quot;Hybrid&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CAOE Mode: |cff79BAECHybrid|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	elseif AOEMode==1 then
+		PQ_AOE = true
+		AOEMode = 2
+		PQ_Rot = &amp;quot;Multi&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CCooldown Mode: |cff006400Multi|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+		PQR_SwapRotation(&amp;quot;Enhance AoE PvE (CuteOne)&amp;quot;)
+	end
+end
+
+PQR_Event(&amp;quot;PQR_Text&amp;quot;,&amp;apos;CD-Mode: &amp;apos;..PQ_CDMode..&amp;apos; --- &amp;apos;..&amp;apos;AOE-Mode: &amp;apos;..PQ_Rot)</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Pause</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if IsLeftAltKeyDown() 
+or IsMounted()
+or ubid(p,gw) 
+or SpellIsTargeting() 
+or UnitBuffID(&amp;quot;player&amp;quot;,5384) 
+or UnitInVehicle(&amp;quot;player&amp;quot;) 
+or UnitIsDead(&amp;quot;target&amp;quot;) 
+or UnitIsDead(&amp;quot;player&amp;quot;) 
+or UnitBuffID(&amp;quot;player&amp;quot;, 77769) 
+or (not UnitAffectingCombat(&amp;quot;player&amp;quot;) and not sir(gsi(ss),t)==1) then
+	return true
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Shield and Weapons</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>------Shields Up------
+if not IsMounted() then
+	if powper&amp;gt;=25 and not ubid(p,ls) and not ubid(p,ws) then
+		cast(gsi(ls))
+	end
+	if powper &amp;lt; 25 and not ubid(p,ws) then
+		cast(gsi(ws))
+	end
+	if powper &amp;gt; 75 and ubid(p,ws) then	
+		cast(gsi(ls))
+	end
+
+------Weapons Online-----
+
+	if hasmh == false then
+		cast(gsi(wfw), p)
+	end
+	if hasoh == false then
+		cast(gsi(ftw), p)
+	end
+end</Lua><RecastDelay>1000</RecastDelay><Target>Player</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Totem Management</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if outcom and hasfire==true and not UnitExists(t) then
+	totemX,totemY = 0,0
+	cast(gsi(tr))
+end
+--if incom and sir(gsi(ll),t)==1 then
+--	if AoE == false then
+--		if hasfire==false and cd(fet) &amp;gt; 0 then
+--			cast(gsi(srt))
+--		end
+--		if fire == gsi(mt) then
+--			cast(gsi(tr))
+--		end
+--	end
+--	if AoE == true then
+--		if hasfire==false then
+--			cast(gsi(mt))
+--		end
+--		if fire == gsi(srt) then
+--			cast(gsi(tr))
+--		end
+--	end
+--end
+
+if incom and sir(gsi(ll),t)==1 then
+	if AoE == false then
+		if hasfire==false and cd(fet) &amp;gt; 0 then
+			totemX,totemY = GetPlayerMapPosition(&amp;quot;Player&amp;quot;)
+			cast(gsi(srt))
+		end
+		if fire == gsi(mt)  or totemDistance() &amp;gt; 17 then
+			totemX,totemY = 0,0
+			cast(gsi(tr))
+		end
+	end
+	if AoE == true then
+		if hasfire==false then
+			totemX,totemY = GetPlayerMapPosition(&amp;quot;Player&amp;quot;)
+			cast(gsi(mt))
+		end
+		if fire == gsi(srt) or totemDistance() &amp;gt; 4 then
+			totemX,totemY = 0,0
+			cast(gsi(tr))
+		end
+	end
+end
+
+if incom and check(st) and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto) then
+	totemX,totemY = GetPlayerMapPosition(&amp;quot;Player&amp;quot;)
+	cast(gsi(st))
+end
+if incom and check(eet) and cd(fet) &amp;gt; 0 and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto) then
+	totemX,totemY = GetPlayerMapPosition(&amp;quot;Player&amp;quot;)
+	cast(gsi(eet))
+end
+if incom and check(fet) and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto) then
+	totemX,totemY = GetPlayerMapPosition(&amp;quot;Player&amp;quot;)
+	cast(gsi(fet))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Interrupt</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>--if incom and check(gt) and cd(gsi(wsh))~=0 and Interruptable(t,gt) then
+--	cast(gsi(gt))
+--end
+if incom and check(wsh) and Interruptable(t,wsh) then
+	cast(gsi(wsh),t) 
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Ascendance</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if check(asc) and not ubid(p,asb) and sir(gsi(ll),t)==1 and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto) then	
+	cast(gsi(asc))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Defensive</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if check(sr) then
+	cast(gsi(sr))
+end
+if php&amp;lt;=80 and cd(gsi(gon))==0 then
+	cast(gsi(gon),p)
+end
+if php&amp;lt;=75 and check(hst) then
+	totemX,totemY = GetPlayerMapPosition(&amp;quot;Player&amp;quot;)
+	cast(gsi(hst))
+end
+if php&amp;lt;=50 and mwc==5 then
+	cast(gsi(hs))
+end
+if php&amp;lt;=30 and check(ass) then
+	cast(gsi(ass))
+end
+if php&amp;lt;=25 and cd(ag)==0 then
+	cast(gsi(ag))
+end
+if php&amp;lt;=25 and cd(fer)==0 then
+	cast(gsi(fer))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Racials</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if check(bf) and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto) then 
+	cast(gsi(bf))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Unleash Elements</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if pow&amp;gt;=820 and check(ue) and inMelee==true then
+	cast(gsi(ue))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Chain Lightning</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if AOEMode~=0 and pow&amp;gt;=12200 and mwc==5 and check(cl) then
+	cast(gsi(cl))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Lava Lash</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if pow&amp;gt;=1600 and check(ll) then
+	if AoE==false and sfc==5 then
+		cast(gsi(ll))
+	end
+	if AoE==true and (udbid(t,fs,p) or sfc==5) then
+		cast(gsi(ll))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Fire Nova</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if AOEMode~=0 and cd(fn)==0 and udbid(t,fs,p) then
+	cast(gsi(fn))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Unleashed Fury</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if pow&amp;gt;=820 and check(ue) and inMelee==true and hasuf==true then
+	cast(gsi(ue))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>SetSingle</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>AoE = false</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>SetAoE</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>AoE = true</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Lightning Bolt</Name><Default>false</Default><SpellID>403</SpellID><Actions></Actions><Lua>if AOEMode==0 and mwc &amp;gt; 1 and check(lb) and ubid(p,asc) then
+	cast(gsi(lb))
+end</Lua><RecastDelay>1000</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Earth Shock</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if check(es) then
+	cast(gsi(es))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Elemental Blast</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if check(eb) and inMelee==true then
+	cast(gsi(eb))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Elemental Mastery</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if check(em) and inMelee==true and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto) then
+	cast(gsi(em))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Lightning Bolt (5 Stacks)</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if AOEMode==0 and pow&amp;gt;=2840 and (mwc==5 or InMelee==false) and check(lb) then
+	cast(gsi(lb))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Lightning Bolt (MW3 &amp; UF DB &amp; Asc)</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if AOEMode==0 and check(lb) and udbid(t,uf,p) and ubid(p,asc) and mwc &amp;gt;= 3 then
+	cast(gsi(lb))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Ancestral Swiftness</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if check(asw) and mwc &amp;lt; 2 then
+	cast(gsi(asw))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Lightning Bolt (Asw)</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if AOEMode==0 and ubid(p,asw) and check(lb) then
+	cast(gsi(lb))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Feral Spirit</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if cd(fer)==0 and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto) then 
+	cast(gsi(fer))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Spiritwalkers Grace</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if check(sg) and PQR_IsMoving(1) and incom then
+	cast(gsi(sg))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Stormblast</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if ubid(p,asb) and cd(sb)==0 then
+	cast(gsi(sb),t)
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Stormstrike</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if pow&amp;gt;=3760 and check(ss) and not ubid(p,asb) then
+	cast(gsi(ss),t)
+end
+if ubid(p,asb) and check(sb) then
+	cast(gsi(sb),t)
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Flame Shock (Unleashed Flame)</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if pow&amp;gt;=1190 and check(fs) and ubid(p,ufl) and fsr &amp;lt; 7 then
+	cast(gsi(fs))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Flame Shock (Flame Shock Debuff)</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if pow&amp;gt;=1190 and check(fs) and not udbid(t,fs,p) then
+	cast(gsi(fs))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Ghost Wolf</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if sir(gsi(ll),t)~=1 and not ubid(p,gw) and not ubid(p,asc) and PQR_IsMoving(1) and cd(sg) &amp;gt; 0 and not ubid(p,sg) and not IsMounted() then
+	cast(gsi(gw))
+end
+if sir(gsi(ll),t)==1 and ubid(p,gw) then
+	RunMacroText(&amp;quot;/cancelform&amp;quot;)
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Lightning Bolt (Spiritwalk)</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if AOEMode==0 and incom and ubid(p,sg) and check(lb) and sir(gsi(ll),t)~=1 then
+	cast(gsi(lb))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Profession</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto) then
+	--Synapse Springs
+	if GetInventoryItemCooldown(p,10) == 0 then
+		UseInventoryItem(10)
+	end
+	if GetInventoryItemCooldown(p,6) == 0 then
+		UseInventoryItem(6)
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability></SHAMAN>

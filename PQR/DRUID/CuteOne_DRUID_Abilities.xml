@@ -1,0 +1,1652 @@
+<?xml version="1.0" encoding="utf-8" ?><DRUID><Ability><Name>Initial</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if PQR_RotationStarted == true then
+	PQR_RotationStarted = false
+	if PQR_LoadLua ~= nil then
+   		if PQR_LoadLua(&amp;quot;PQR_CuteOne.lua&amp;quot;) == false then 
+      		PQR_WriteToChat(&amp;quot;Put PQR_CuteOne.lua in the data folder.&amp;quot;, &amp;quot;Error&amp;quot;)
+      		PQR_StopRotation()
+       		return true
+		end
+		--if PQR_LoadLua(&amp;quot;PQR_CuteOneNova.lua&amp;quot;) == false then 
+      	--	PQR_WriteToChat(&amp;quot;Put PQR_CuteOneNova.lua in the data folder.&amp;quot;, &amp;quot;Error&amp;quot;)
+      	--	PQR_StopRotation()
+       	--	return true
+		--end
+	end
+  	rotchange = 0
+end
+
+shcom()
+timecheck()
+--Dummy 5min DPS Test
+if UnitExists(&amp;quot;target&amp;quot;) then
+if cTime &amp;gt;= 300 and dummy() then  
+	StopAttack()
+	ClearTarget()
+	print(&amp;quot;5 Minute Dummy Test Concluded - Profile Stopped&amp;quot;)
+	--PQR_StopRotation()
+end
+end
+
+if UnitBuffID(&amp;quot;target&amp;quot;,117961) then
+	StopAttack()
+end
+  
+------ABILITIES-------
+af	=	1066	--Aquatic Form
+bar	=	22812	--Barkskin
+bf	=	5487	--Bear Form
+ber	=	106951	--Berserk
+cf 	= 	768		--Cat Form
+cy	=	33786	--Cyclone
+dsh	=	1850	--Dash
+er	=	339		--Entangling Roots
+ff	=	770		--Faerie Fire
+fb	=	22568	--Ferocious Bite
+fr	=	22842	--Frenzied Regeneration
+grl	=	6795	--Growl
+ht	=	5185	--Healing Touch
+hib	=	2637	--Hibernate
+hur	=	16914	--Hurricane
+inc	=	106731	--Incarnation: King of the Jungle
+inn	=	29166	--Innervate
+lac =	33745	--Lacerate
+ma	=	22570	--Maim
+mgl	=	33876	--Mangle
+mbf	=	33878	--Mangle: Bear Form
+mow	=	1126	--Mark of the Wild
+ml	=	6807	--Maul
+mu	=	106922	--Might of Ursoc
+mf	=	8921	--Moonfire
+ng	=	16689	--Nature&amp;apos;s Grasp
+nv	=	124974	--Nature&amp;apos;s Vigil
+pnc	=	9005	--Pounce
+prl	=	5215	--Prowl
+rk	=	1822	--Rake
+rvf =	102545	--Ravage!
+rvg	=	6785	--Ravage
+rb	=	20484	--Rebirth
+rej	=	774		--Rejuvenation
+rc	=	2782	--Remove Corruption
+rv	=	50769	--Revive
+rp	=	1079	--Rip
+sr	=	52610	--Savage Roar
+shr	=	5221	--Shred
+sb	=	80965	--Skull Bash
+sth	=	2908	--Soothe
+str	=	77764	--Stampeding Roar
+si	=	61336	--Survival Instincts
+sff	=	40120	--Swift Flight Form
+sw	=	62078	--Swipe
+swb	=	779		--Swipe: Bear Form
+sym	=	110309	--Symbiosis
+thr	=	106832	--Thrash
+thb	=	77758	--Thrash: Bear Form
+tf	=	5217	--Tiger&amp;apos;s Fury
+tq	=	740		--Tranquility
+trf	=	783		--Travel Form
+wth =	5176	--Wrath
+
+------Talents------
+fon	=	106737	--Force of Nature
+--fonchrg = GetSpellCharges(fon)	--Force of Nature Charges
+how	=	108288 	--Heart of the Wild
+mb	=	5211	--Mighty Bash
+ty	=	132469	--Typhoon
+
+------Racials------
+rber =	26297	--Troll Racial - Berserking	
+
+------PROCS------
+ps	= 	16974	--Predatory Swiftness
+wa	= 	113746	--Weakened Armor - Faerie Fire Debuff
+cc 	= 	135700	--Clearcasting
+dcd	=	145152	--Dream of Cenarius Damage Buff
+srf =	114236	--Shred Glyph
+inb = 	102543	--Incarnation: King of the Jungle buff
+ro1	=	139121	--Rune of Re-Origination: Haste
+ro2	=	139117	--Rune of Re-Origination: Critical Strike
+ro3	=	139120	----Rune of Re-Origination: Mastery
+
+-----SYMBIOSIS SPELLS------
+symdk	=	122282 	--Death Coil
+symhtr	=	110597 	--Play Dead
+symmag	=	110693 	--Frost Nova
+symmon	=	126449 	--Clash
+sympal	=	110700 	--Divine Shield
+sympri	=	110715	--Dispersion
+symrog	=	110730	--Redirect
+symsha	=	110807	--Feral Spirit
+symloc	=	110810	--Soul Swap
+symwar	=	112997	--Shattering Blow
+
+----Announce across the screen----
+if not Nova_Notify then
+ Nova_NotifyFrame = nil
+ function Nova_NotifyFrame_OnUpdate()
+  if (Nova_NotifyFrameTime &amp;lt; GetTime() - 5) then
+   local alpha = Nova_NotifyFrame:GetAlpha()
+   if (alpha ~= 0) then Nova_NotifyFrame:SetAlpha(alpha - .02) end
+   if (alpha == 0) then Nova_NotifyFrame:Hide() end
+  end
+ end
+ 
+ -- Debug messages.
+ function Nova_Notify(message)
+  Nova_NotifyFrame.text:SetText(message)
+  Nova_NotifyFrame:SetAlpha(1)
+  Nova_NotifyFrame:Show()
+  Nova_NotifyFrameTime = GetTime()
+ end
+ 
+ -- Debug Notification Frame
+ Nova_NotifyFrame = CreateFrame(&amp;apos;Frame&amp;apos;)
+ Nova_NotifyFrame:ClearAllPoints()
+ Nova_NotifyFrame:SetHeight(300)
+ Nova_NotifyFrame:SetWidth(300)
+ Nova_NotifyFrame:SetScript(&amp;apos;OnUpdate&amp;apos;, Nova_NotifyFrame_OnUpdate)
+ Nova_NotifyFrame:Hide()
+ Nova_NotifyFrame.text = Nova_NotifyFrame:CreateFontString(nil, &amp;apos;BACKGROUND&amp;apos;, &amp;apos;PVPInfoTextFont&amp;apos;)
+ Nova_NotifyFrame.text:SetAllPoints()
+ Nova_NotifyFrame:SetPoint(&amp;apos;CENTER&amp;apos;, 0, 200)
+ Nova_NotifyFrameTime = 0
+end
+
+
+------TALENTS/GLYPHS/TIER 15------
+-- Dream of Cenarius Talent Check
+if select(5,GetTalentInfo(17))==true then
+	doct = true
+else
+	doct = false
+end
+-- Shred Glyph Check
+if GlyphCheck(114234)==true then
+	srg = true
+else
+	srg = false
+end
+-- Savage Roar Glyph Check
+if GlyphCheck(127540)==true then
+	svg = true
+else
+	svg = false
+end
+-- Tier 15 Item Count
+if giid(p,1)==96581 or giid(p,1)==95237 or giid(p,1)==95837 then
+	t15head = 1
+else
+	t15head = 0
+end
+if giid(p,3)==96583 or giid(p,3)==95239 or giid(p,3)==95839 then
+	t15shoulder = 1
+else
+	t15shoulder = 0
+end
+if giid(p,5)==96579 or giid(p,5)==95235 or giid(p,5)==95835 then
+	t15chest = 1
+else
+	t15chest = 0
+end
+if giid(p,7)==96582 or giid(p,7)==95238 or giid(p,7)==95838 then
+	t15leg = 1
+else
+	t15leg = 0
+end
+if giid(p,10)==96580 or giid(p,10)==95236 or giid(p,10)==95836 then
+	t15hand = 1
+else 
+	t15hand = 0
+end
+t15count = t15head + t15shoulder + t15chest + t15leg + t15hand
+-- Rune of Reorigination - Trash Variable
+if rorothr==nil then
+	rorothr = 0
+end
+-- Symbiosis
+if symcast==nil then
+	symcast = 0
+end
+
+------BUFF/DEBUFF TRACKING------
+-- Rune of Reorigination
+if ubid(p,ro1) or ubid(p,ro2) or ubid(p,ro3) then
+	if ubid(p,ro1) then
+		rrr = (select(7, ubid(p,ro1)) - GetTime())
+	end
+	if ubid(p,ro2) then
+		rrr = (select(7, ubid(p,ro2)) - GetTime())
+	end
+	if ubid(p,ro3) then
+		rrr = (select(7, ubid(p,ro3)) - GetTime())
+	end
+else
+	rrr = 0
+end 	
+-- Renataki&amp;apos;s Soul Charm
+if ubid(p, 138756) then
+	rscr = (select(7, ubid(p, 138756)) - GetTime())
+	rscbuff = select(4,ubid(p,138737))
+else
+	rscr = 0
+	rscbuff = 0
+end
+-- Dream of Cenarius Stack Count
+if select(4,ubid(p,dcd)) == nil then
+	docbuff = 0
+	dcb = 1
+else 
+	docbuff = select(4,ubid(p,dcd))
+	dcb = 1.25
+end
+-- Damage Formulas
+		
+mgld = ((((select(2, UnitDamage(&amp;quot;player&amp;quot;)) - select(1, UnitDamage(&amp;quot;player&amp;quot;)))/2)*5)+390)*dcb
+crkd = (((UnitAttackPower(&amp;quot;player&amp;quot;)*0.3)+99)*(1+(GetMasteryEffect()/100))*select(7, UnitDamage(&amp;apos;player&amp;apos;)))*dcb --Rake Damage
+if nDbDmg(rk, t)~=nil then
+	rkd = nDbDmg(rk, t)
+else
+	rkd = 0
+end
+if rkd &amp;gt; 0 then
+	rkp = round2(((crkd / rkd)*100),2)
+else
+	rkp = 0
+end
+crpd = ((113 + 320 * 5 * 1 + 0.0484 * 5 * UnitAttackPower(&amp;quot;player&amp;quot;) * 1)*(1+(GetMasteryEffect()/100))*select(7, UnitDamage(&amp;apos;player&amp;apos;)))*dcb
+if nDbDmg(rp, t)~=nil then
+	rpd = nDbDmg(rp, t)
+else
+	rpd = 0
+end
+if rpd &amp;gt; 0 then
+	rpp = round2(((crpd / rpd)*100),2)
+else
+	rpp = 0
+end
+-- Rip Tracker and Attack Power Set
+if udbid(t,rp,p) and plvl &amp;gt;= 20 then
+	rpr = (select(7, udbid(t,rp,p)) - GetTime())
+else
+	if plvl &amp;lt; 20 then
+		rpr = 999
+	else
+		rpr = 0
+	end
+end
+-- Rake Tracker and 	
+if udbid(t,rk,p) then
+	rkr = (select(7, udbid(t,rk,p)) - GetTime())
+else
+	rkr = 0
+end
+-- Savage Roar Tracker
+if ubid(p,sr) and plvl &amp;gt;= 18 then
+	srr = (select(7, ubid(p,sr)) - GetTime())
+else
+	if plvl &amp;lt; 18 then
+		srr = 999
+	else
+		srr = 0
+	end
+end
+-- Berserk - Unit Power requirement modifier as Berserk makes energy usage half
+if ubid(p,ber) then
+	pow = pow*2
+else
+	pow = UnitPower(p)
+end
+-- Weakened Armor Tracker and Stack Count
+if udbid(t,wa) then
+	wac = select(4, udbid(t,wa))
+	war = (select(7, udbid(t,wa)) - GetTime())
+else
+	wac = 0
+	war = 0
+end
+-- Trash Tracker
+if udbid(t,thr,p) then
+	thrr = (select(7, udbid(t,thr,p)) - GetTime())
+else
+	thrr = 0
+end
+-- Nil Catch for Current Rake Attack Power Variable
+if crkap == nil or outcom then
+	crkap = 0
+end
+-- Nil Catch for Current Rip Attack Power Variable
+if crpap == nil or outcom then
+	crpap = 0
+end
+-- Predatory Swiftness Tracker
+if ubid(p,ps) then
+	psr = (select(7, ubid(p,ps)) - GetTime())
+else
+	psr = 0
+end
+-- Savage Roar / Rip Tracking Comparison
+if plvl &amp;gt;= 20 then
+	if (rpr - srr) &amp;lt; 0 then
+		srrpdiff = -(rpr - srr)
+	else
+		srrpdiff = (rpr - srr)
+	end
+end
+-- Nil Catch for Total New Savage Roar Duration
+if srt == nil then
+	srt = 0
+end
+-- Opening Sequence Trigger
+if plvl &amp;gt;= 20 then
+	if outcom then
+		opener = 1
+	elseif srr &amp;gt; 0 and rkr &amp;gt; 0 and rpr &amp;gt; 0 then
+		opener = 0
+	end
+end
+
+------TOGGLES/HOTKEYS------
+-- CD Switch
+if PQ_CDMode==nil then
+	PQ_CDMode = &amp;quot;Boss&amp;quot;
+end
+if IsRightControlKeyDown() and not GetCurrentKeyBoardFocus() and GetTime() - PQ_CDTimer &amp;gt; 0.25 then
+	PQ_CDTimer = GetTime()
+	
+	if not PQ_CD then
+		PQ_CD = CD_BossOnly
+		PQ_CDMode = &amp;quot;Boss&amp;quot;
+		Nova_Notify(&amp;quot;|cff347C2CCooldown Mode: |cff79BAECBoss Only|cffffffff&amp;quot;)
+	elseif PQ_CD == CD_BossOnly then
+		PQ_CD = CD_Auto
+		PQ_CDMode = &amp;quot;On&amp;quot;
+		Nova_Notify(&amp;quot;|cff347C2CCooldown Mode: |cff006400On|cffffffff&amp;quot;)
+	else
+		PQ_CD = false
+		PQ_CDMode = &amp;quot;Off&amp;quot;
+		Nova_Notify(&amp;quot;|cff347C2CCooldown Mode: |cffDC143COff|cffffffff&amp;quot;)
+	end
+end
+
+-- AoE/Single Switch
+if AOEMode == nil then
+	AOEMode = 0
+end 
+if PQ_Rot == nil then
+	PQ_Rot = &amp;quot;Single&amp;quot;
+end
+
+if IsRightShiftKeyDown() and not GetCurrentKeyBoardFocus() and GetTime() - PQ_AOETimer &amp;gt; 0.25 then
+	PQ_AOETimer = GetTime()
+	
+	if PQ_AOE then
+		PQ_AOE = false
+		AOEMode = 0
+		PQ_Rot = &amp;quot;Single&amp;quot;
+		PQR_SwapRotation(&amp;quot;Kitty-Single (CuteOne)&amp;quot;)
+		Nova_Notify(&amp;quot;|cff347C2CAOE Mode: |cffDC143CSingle|cffffffff&amp;quot;)
+	elseif AOEMode==0 then
+		PQ_AOE = false
+		AOEMode = 1
+		PQ_Rot = &amp;quot;Hybrid&amp;quot;
+		Nova_Notify(&amp;quot;|cff347C2CAOE Mode: |cff79BAECHybrid|cffffffff&amp;quot;)
+	elseif AOEMode==1 then
+		PQ_AOE = true
+		AOEMode = 2
+		PQ_Rot = &amp;quot;Multi&amp;quot;
+		Nova_Notify(&amp;quot;|cff347C2CAOE Mode: |cff006400Multi|cffffffff&amp;quot;)
+		PQR_SwapRotation(&amp;quot;Kitty-Multi (CuteOne)&amp;quot;)
+	end
+end
+
+-- Symbiosis Auto/Manual Switch
+if SymMode == nil then
+	SymMode = 0
+end
+if PQ_Symb == nil then
+	PQ_Symb = &amp;quot;Auto&amp;quot;
+end
+
+if IsRightAltKeyDown() and not GetCurrentKeyBoardFocus() and GetTime() - PQ_SymTimer &amp;gt; 1 then
+	PQ_SymTimer = GetTime()
+	
+	if PQ_Sym then
+		PQ_Sym = false
+		SymMode = 0
+		PQ_Symb = &amp;quot;Auto&amp;quot;
+		Nova_Notify(&amp;quot;|cff347C2CSymbiosis Mode: |cff006400Auto|cffffffff&amp;quot;)	
+	else
+		PQ_Sym = true
+		SymMode = 1
+		PQ_Symb = &amp;quot;Manual&amp;quot;
+		Nova_Notify(&amp;quot;|cff347C2CSymbiosis Mode: |cffDC143CManual|cffffffff&amp;quot;)
+	end
+end
+
+-- PQI Addon: Toggle Status Display
+PQR_Event(&amp;quot;PQR_Text&amp;quot;,&amp;apos;CD-Mode: &amp;apos;..PQ_CDMode..&amp;apos; --- &amp;apos;..&amp;apos;AOE-Mode: &amp;apos;..PQ_Rot..&amp;apos; --- &amp;apos;..&amp;apos;Sym-Mode: &amp;apos;..PQ_Symb)
+--PQR_Event(&amp;quot;PQR_Text&amp;quot;,&amp;apos;rpd: &amp;apos;..round2(rpd,2)..&amp;apos; --- &amp;apos;..&amp;apos;crpd: &amp;apos;..round2(crpd,2)..&amp;apos; --- &amp;apos;..&amp;apos;rpp: &amp;apos;..rpp)
+
+------ETC------
+-- Data File Functions
+BehindFunc()
+ttd(&amp;quot;target&amp;quot;)
+GroupInfo()
+SymMem()
+if UnitExists(&amp;quot;target&amp;quot;)~=nil then
+	bossID = tonumber(UnitGUID(t):sub(-13, -9), 16)
+else
+	bossID = 0
+end
+
+-- Mouse click to add to queue
+--if not ToolTipHooked then
+--	GameTooltip:HookScript(&amp;quot;OnTooltipSetSpell&amp;quot;, function(self)
+--    	local id = select(3,self:GetSpell())
+--    	if id then getid = id end
+--	end)
+--	ToolTipHooked = true
+--end
+--if UnitAffectingCombat(&amp;quot;player&amp;quot;) and IsMouseButtonDown() then
+--	if getid~=nil then
+		--RunMacroText(&amp;quot;/novaspell &amp;quot;..getid)
+--		CheckForValidSpell(GetSpellInfo(getid))
+--	end
+--end
+
+--Low Level
+if plvl &amp;lt; 6 then
+	if check(mf) and not udbid(t,mf) then
+		cast(gsi(mf))
+	elseif check(wth) then
+		cast(gsi(wth))
+	end
+end
+
+	if not IsMounted() and (not UnitExists(&amp;quot;target&amp;quot;) or UnitIsDead(&amp;quot;target&amp;quot;)) then
+		if incom and (AOEMode==1 or AOEMode==2) then
+			TargetNearestEnemy()
+		end
+		if sir(gsi(108557),t)==1 then
+			RunMacroText(&amp;quot;/startattack&amp;quot;)
+		end
+	end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Berserk</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom
+	and ubid(p,cf) 
+	and not ubid(p,prl) 
+	and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto)
+	and pow&amp;gt;=75 
+	and check(ber) 
+	and ubid(p,sr) 
+	and ubid(p,tf) --or (ttd(t) &amp;lt; 18 and cd(tf) &amp;gt; 6))
+	and sir(gsi(mgl),t)==1 
+	and cd(gsi(tf)) &amp;gt; 6
+	and ttd(t)&amp;gt;=18
+then 
+	cast(gsi(ber)) 
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Faerie Fire</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if cd(ff)==0 and sir(gsi(ff),t)==1 then
+	if incom or (outcom and select(2,IsInInstance())==&amp;quot;none&amp;quot;) then 
+		if not udbid(t,wa) and not ubid(p,prl) then 
+			if war==0 or wac &amp;lt; 3 then
+				cast(gsi(ff)) 
+			end
+		end
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Ferocious Bite</Name><Default>false</Default><SpellID>22568</SpellID><Actions></Actions><Lua>if ubid(p,cf) and check(fb) and pow&amp;gt;=25 and not HaveBuff(p,{139121,139117,139120}) and rscbuff&amp;lt;=5 then
+	if thp &amp;gt; 25 and srr &amp;gt; 3  and cp==5 then
+		if bossID == 63053 then
+			cast(gsi(fb))
+		end
+		if pow&amp;gt;=50 and rpr &amp;gt; 8 and (docbuff==0 or (docbuff==2 and rkp &amp;lt; 108) or (docbuff==1 and rpp &amp;lt; 108)) then
+			cast(gsi(fb))
+		end
+		if ((srr &amp;lt;= 3 and rpr &amp;gt; 0) or ttd(t) &amp;lt; 15) then
+			cast(gsi(fb))
+		end
+	end
+	if thp &amp;lt;= 25 and rpr &amp;gt; 0 then
+		if cp==5 and pow&amp;gt;=50 and srr &amp;gt; 3 then
+			cast(gsi(fb))
+		end
+		if cp&amp;gt;=1 and rpr &amp;gt; 0 and rpr&amp;lt;=3 then
+			cast(gsi(fb))
+		end
+	end
+	if pow&amp;gt;=50 and cp==5 and srr&amp;lt;=4 and rpr &amp;gt; 8 then
+		cast(gsi(fb))
+	end
+	if pow&amp;gt;=25 and cp==5 and srr&amp;lt;=3 and rpr &amp;gt; 8 then
+		cast(gsi(fb))
+	end
+	if pow&amp;gt;=25 and cp&amp;gt;=3 and ttd(t)&amp;lt;=5 then
+		cast(gsi(fb))
+	end
+end
+--if ubid(p,cf) and check(fb) and pow&amp;gt;=25 then
+--	if cp &amp;gt; 0 and rpr &amp;gt; 0 and rpr&amp;lt;=3 and thp&amp;lt;=25 then
+--		cast(gsi(fb))
+--	end
+--	if ttd(t)&amp;lt;=1 and cp&amp;gt;=3 then
+--		cast(gsi(fb))
+--	end
+--	if cp&amp;gt;=5 and rpr &amp;gt; 0 and thp&amp;lt;=25 then
+--		cast(gsi(fb))
+--	end
+--	if cp&amp;gt;=5 and rpr &amp;gt; 0 and not ((rpr - 2) &amp;lt;= (tmp - 1)) and not ((srr - 3) &amp;lt;= (tmp - 1)) then
+--		cast(gsi(fb))
+--	end
+--end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Healing Touch</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and plvl&amp;gt;=26 then
+--	if ubid(p,ps) and cp&amp;gt;=4 then
+--		if members[1].HP &amp;lt; php and not udbid(members[1].Unit, 137341, nil) and not LineOfSight(members[1].Unit) then
+--			PQR_CustomTarget = members[1].Unit
+--			cast(gsi(ht),PQR_CustomTarget)
+--		else
+--			cast(gsi(ht),p)
+--		end
+--	end
+--	if ubid(p,ps) and psr&amp;lt;=1.5 then
+--		if members[1].HP &amp;lt; php and not udbid(members[1].Unit, 137341, nil) and not LineOfSight(members[1].Unit) then
+--			PQR_CustomTarget = members[1].Unit
+--			cast(gsi(ht),PQR_CustomTarget)
+--		else
+--			cast(gsi(ht),p)
+--		end
+--	end
+	
+	if TalentCheck(dcd) and ubid(p,ps) and not ubid(p,dcd) and (psr &amp;lt; 1.5 or cp&amp;gt;=4) then
+		if members[1].HP &amp;lt; php and not udbid(members[1].Unit, 137341, nil) and not LineOfSight(members[1].Unit) then
+			PQR_CustomTarget = members[1].Unit
+			cast(gsi(ht),PQR_CustomTarget)
+		else
+			cast(gsi(ht),p)
+		end
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Forms</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if not (pcasting or pchannel) and not ubid(p,how) then
+	if (incom or IsOutdoors()==nil) and not ubid(p,cf) and not ubid(p,bf) and not (IsMounted() or ubid(p,sff)) then 
+		cast(gsi(cf),nil)
+	end
+	if outcom and not ubid(p,cf) and IsSwimming()~=nil and not ubid(p,af) then 
+		cast(gsi(af),nil)
+	end
+	if outcom and not ubid(p,cf) and IsFlyableArea()==nil and IsOutdoors()~=nil and IsSwimming()==nil and GetUnitSpeed(p)&amp;gt;0 and not IsMounted()==nil then
+		cast(gsi(trf),nil)
+	end
+end</Lua><RecastDelay>2000</RecastDelay><Target>Custom</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Mark of the Wild</Name><Default>false</Default><SpellID>1126</SpellID><Actions></Actions><Lua>---Mark of the Wild---
+if (not IsMounted() or ubid(p,sff)) and outcom and plvl &amp;gt;= 62 and not ubid(p,104934) and not ubid(p,104269) then
+	for i=1,#members do 
+	    if not HaveBuff(members[i].Unit,{115921,20217,1126,90363}) and (#members==select(5,GetInstanceInfo()) or select(2,IsInInstance())==&amp;quot;none&amp;quot;)
+	    then return true end
+	end
+end</Lua><RecastDelay>1000</RecastDelay><Target>Player</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Interrupts</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and cd(mb)==0 and sir(gsi(mb),t)==1 and (cd(gsi(sb))~=0 and cd(gsi(sb))&amp;lt;=14) and (Interruptable(t,mb) or tcasting) then
+	cast(gsi(mb),t)
+end
+if incom and check(sb) and Interruptable(t,sb) then
+	cast(gsi(sb),t) 
+end
+if incom and cd(ty)==0 and Interruptable(t,ty) then
+	cast(gsi(ty),t)
+end
+if incom and check(ma) and cd(sb)~=0 and Interruptable(t,ma) and cp &amp;gt; 0 and pow&amp;gt;=35 and (select(2,GetInstanceInfo())==&amp;quot;arena&amp;quot; or select(2,GetInstanceInfo())==&amp;quot;pvp&amp;quot;) then
+	cast(gsi(ma),t)
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Prowl</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if outcom and not IsStealthed() and canattack and ubid(p,cf) and check(prl) then 
+	cast(gsi(prl)) 
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Rake</Name><Default>false</Default><SpellID>1822</SpellID><Actions></Actions><Lua>if ubid(p,cf) and check(rk) and (srr &amp;gt; 1 or srg==false) and pow&amp;gt;=35 then 
+	if HaveBuff(p,{139121,139117,139120}) and cp &amp;lt; 5 then
+		cast(gsi(rk))
+ 	end
+ 	if rkr &amp;lt; 3 or (rkp &amp;gt; 108 and (rscbuff==0 or rscbuff&amp;gt;=9)) then
+  		cast(gsi(rk))
+ 	end
+end
+
+--if ubid(p,cf) and check(rk) and (srr &amp;gt; 1 or srg==false) and pow&amp;gt;=35 and (rscbuff==0 or rscbuff&amp;gt;=9 or rkr &amp;lt; 3) then 
+--	if ((crkd &amp;gt; mgld and crkd &amp;gt;=rkd) 
+--		or (HaveBuff(p,{139121,139117,139120}) and rkr&amp;lt;9 and rrr &amp;lt;= 1.5) 
+--		or ((ttd(t) - rkr) &amp;gt; 3 and (crkd &amp;gt; rkd or rkr &amp;lt; 3)))
+--	then
+--		cast(gsi(rk))
+--	end
+--end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Ravage</Name><Default>false</Default><SpellID>6785</SpellID><Actions></Actions><Lua>if not IsLeftAltKeyDown() 
+and not SpellIsTargeting()
+and not UnitChannelInfo(p) 
+and not UnitIsDeadOrGhost(p) 
+and IsStealthed()
+and (srr &amp;gt; 1 or srg==false)
+and sir(gsi(mgl),t)==1
+and ubid(p,cf)
+then
+	if plvl &amp;gt;= 32 and UnitIsPVP(p) ~= nil and behind==false and pow&amp;gt;=50 then
+		cast(gsi(pnc))
+	elseif plvl &amp;lt; 54 or srg==false or behind==false and pow&amp;gt;=35 then
+		cast(gsi(mgl))
+	elseif pow&amp;gt;=45 then
+		cast(gsi(rvg))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Rip</Name><Default>false</Default><SpellID>1079</SpellID><Actions></Actions><Lua>if ubid(p,cf) and check(rp) and pow&amp;gt;=30 and cp==5 and srr &amp;gt; 1 and bossID~=63053 and ttd(t)&amp;gt;=15 then
+	if HaveBuff(p,{139121,139117,139120}) then
+		cast(gsi(rp))
+	end
+	if rpr &amp;lt; 6 or (rpp &amp;gt; 108 and (rscbuff==0 or rscbuff&amp;gt;=7)) then
+		cast(gsi(rp))
+	end
+end
+
+--if ubid(p,cf) and check(rp) and pow&amp;gt;=30 and srr &amp;gt; 1 and bossID~=63053 then
+--	if ((cp&amp;gt;=5 and (crpd/rpd)&amp;gt;=1.15 and ttd(t) &amp;gt; 30) 
+--		or (cp&amp;gt;=5 and ttd(t)&amp;gt;=6 and rpr &amp;lt; 2 and (ubid(p,ber) or rpr+1.9 &amp;lt;= cd(tf))))
+--	then
+--		cast(gsi(rp))
+--	end
+--end</Lua><RecastDelay>1000</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Savage Roar</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if ubid(p,cf) then
+	if cp&amp;gt;=1 and rpr &amp;gt; 0 and rpr&amp;lt;=3 and thp&amp;lt;=25 then
+		return false
+	else
+		srt = (12 + (cp*6))
+		if not ubid(p,how) then
+			if (IsStealthed() or incom) and canattack==1 and srr&amp;lt;=1 and pow&amp;gt;=25 and (svg==true or cp &amp;gt; 0) then 
+				cast(gsi(sr)) 
+			end
+			if incom and (svg==true or cp &amp;gt; 0) and rpr &amp;gt; 0 and rpr &amp;lt; 10 and srt&amp;gt;=(srr + 12) and srrpdiff &amp;lt;= 4 and pow&amp;gt;=25 then
+				cast(gsi(sr))
+			end
+		end
+	end
+--	if (IsStealthed() or incom) then
+--		if srr==0 and (svg==true or cp &amp;gt; 0) then
+--			cast(gsi(sr))
+--		end
+--		if srr&amp;lt;=3 and (svg==true or cp &amp;gt; 0) and thp &amp;lt; 25 then
+--			cast(gsi(sr))
+--		end
+--		if srr&amp;lt;=3 and (svg==true or cp &amp;gt; 0) and (srr + 2) &amp;gt; rpr then
+--			cast(gsi(sr))
+--		end
+--		if srr&amp;lt;=6 and cp&amp;gt;=5 and (srr + 2) &amp;lt;= rpr then
+--			cast(gsi(sr))
+--		end
+--	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Shred</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if ubid(p,cf) and AOEMode==0 and rkr &amp;gt; 3 and cp &amp;lt; 5 and not HaveBuff(p,{139121,139117,139120}) then
+	if ubid(p,inb) and pow&amp;gt;=45 then
+		cast(gsi(rvf))
+	end
+	if ubid(p,81022,&amp;quot;EXACT&amp;quot;) then
+		cast(gsi(rvf))
+	end
+	if tmp&amp;gt;=1 or (pow&amp;gt;=35 and not ubid(p,inc) and not ubid(p,81022,&amp;quot;EXACT&amp;quot;)) then
+		if t15count &amp;gt;= 2 then
+			if ubid(p,ber) then
+				if srg==true and pow&amp;gt;=45 then
+					cast(gsi(srf))
+				else
+					if behind == false then
+						if check(rk) and (ttd(t) - rkr) &amp;gt; 3 and ((crkd * (rkd + 1)) - (rkd * (rkr / 3))) &amp;gt; mgld then
+							cast(gsi(rk))
+						else
+							cast(gsi(mgl))
+						end
+					else
+						if pow&amp;gt;=45 and behind == true then
+							cast(gsi(shr))
+						end
+					end
+				end
+			else
+				if check(rk) and (ttd(t) - rkr) &amp;gt; 3 and ((crkd * (rkd + 1)) - (rkd * (rkr / 3))) &amp;gt; mgld then
+					cast(gsi(rk))
+				else
+					cast(gsi(mgl))
+				end
+			end
+		else
+			if (ubid(p,ber) or ubid(p,tf)) then
+				if srg==true and pow&amp;gt;=45 then
+					cast(gsi(srf))
+				else
+					if behind == false or plvl &amp;lt; 16 then
+						if check(rk) and (ttd(t) - rkr) &amp;gt; 3 and ((crkd * (rkd + 1)) - (rkd * (rkr / 3))) &amp;gt; mgld then
+							cast(gsi(rk))
+						else
+							cast(gsi(mgl))
+						end
+					else
+						if pow&amp;gt;=45 and behind == true then
+							cast(gsi(shr))
+						end
+					end
+				end
+			else
+				if behind == false or plvl &amp;lt; 16 then
+					if check(rk) and (ttd(t) - rkr) &amp;gt; 3 and ((crkd * (rkd + 1)) - (rkd * (rkr / 3))) &amp;gt; mgld then
+						cast(gsi(rk))
+					else
+						cast(gsi(mgl))
+					end
+				else
+					if pow&amp;gt;=45 and behind == true then
+						cast(gsi(shr))
+					end
+				end
+			end
+		end
+
+--		if (ttd(t) - rkr) &amp;gt; 3 and (crkd*((rkr/3)+1)-rkd*(rkr/3)) &amp;gt; mgld then
+--			cast(gsi(rk))
+--		else
+--			if ((ubid(p,cc) or pow&amp;gt;=45) or ubid(p,ber) or repow&amp;gt;=15) and ((behind==true and t15count &amp;lt; 2) or ((ubid(p,tf) or ubid(p,ber)) and srg==true)) then
+--				cast(gsi(shr))
+--			else
+--				if pow&amp;gt;=35 then
+--					cast(gsi(mgl))
+--				end
+--			end
+--		end
+	end
+end
+		
+--if ubid(p,cf) and AOEMode==0 then
+--	if ubid(p,cc)
+--		or ((cp &amp;lt; 5 and rpr &amp;lt; 3) or ((cp==0 or svg==true) and srr &amp;lt; 2))
+--		or ttd(t)&amp;lt;=8.5
+--		or ((ubid(p,tf) or ubid(p,ber) or ubid(p,nv)) and cd &amp;lt; 5)
+--		or cd(tf)&amp;lt;=3
+--		or tmp&amp;lt;=1
+--	then
+--		if ubid(p,inc) and pow&amp;gt;=45 then
+--			cast(gsi(rvf))
+--		else
+--			if (ttd(t) - rkr) &amp;gt; 3 and (crkd*((rkr/3)+1)-rkd*(rkr/3)) &amp;gt; mgld then
+--				cast(gsi(rk))
+--			else
+--				if ((ubid(p,cc) or pow&amp;gt;=45) or ubid(p,ber) or repow&amp;gt;=15) and (behind==true or ((ubid(p,tf) or ubid(p,ber)) and srg==true)) then
+--					cast(gsi(shr))
+--				else
+--					if pow&amp;gt;=35 then
+--						cast(gsi(mgl))
+--					end
+--				end
+--			end
+--		end
+--	end
+--end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Thrash</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>local bossID = tonumber(UnitGUID(t):sub(-13, -9), 16)
+if incom 
+	and ubid(p,cf)
+	and plvl &amp;gt;= 28 
+	and pow&amp;gt;=50 --Clearcasting Buff / Power Check
+	--and srr &amp;gt; 3 --Savage Roar Active
+	--and rkr &amp;gt; 3 --Rake Active
+	and rpr &amp;gt; 3 --Rip Active
+	and thrr&amp;lt;=3 --Thrash about to fall off or not present
+	and sir(gsi(mgl),t)==1 --In Range
+	and ttd(t)&amp;gt;=6
+	and not (HaveBuff(p,{139121,139117,139120}))
+	and bossID ~= (69700 or 69701)
+then
+	cast(gsi(thr)) --Apply Thrash
+end
+if incom and ubid(p,bf) and cd(thb)==0 then
+	cast(gsi(thb))
+end
+
+--if incom and ubid(p,cf) and plvl&amp;gt;=28 and pow&amp;gt;=50 then
+--	if ttd(t)&amp;gt;=6 and thrr &amp;lt; 3 and (rpr&amp;gt;=4 or ubid(p,ber)) and rpr &amp;gt; 0 then
+--		cast(gsi(thr))
+--	end
+--end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Tiger&amp;apos;s Fury</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and ubid(p,cf) and pow &amp;lt;= 35 and cd(tf)==0 and sir(gsi(mgl),t)==1 and not ubid(p,ber) and not ubid(p,cc) then
+	cast(gsi(tf)) 
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Swipe</Name><Default>false</Default><SpellID>0</SpellID><Actions>/startattack</Actions><Lua>if ubid(p,cf) and AOEMode~=0 and incom and pow&amp;gt;=45 and (thrr &amp;gt; 0 or AOEMode==1) and sir(gsi(mgl),t)==1 then 
+	if AOEMode==1 and rkr &amp;gt; 3 and cp &amp;lt; 5 then
+		cast(gsi(sw)) 
+	else
+		cast(gsi(sw))
+	end
+end
+if ubid(p,bf) and incom and pow&amp;gt;=15 and cd(sw)==0 then
+	cast(gsi(swb))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Pause</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if IsLeftAltKeyDown() 
+or IsMounted()
+or SpellIsTargeting()
+or not UnitExists(&amp;quot;Target&amp;quot;)
+or UnitBuffID(&amp;quot;Player&amp;quot;,80169)
+or UnitBuffID(&amp;quot;Player&amp;quot;,87959)
+or UnitChannelInfo(&amp;quot;Player&amp;quot;) 
+or UnitIsDeadOrGhost(&amp;quot;Player&amp;quot;) 
+or UnitIsDeadOrGhost(&amp;quot;Target&amp;quot;)
+or UnitBuffID(&amp;quot;target&amp;quot;,117961) --Impervious Shield - Qiang the Merciless
+or UnitDebuffID(&amp;quot;player&amp;quot;,135147) --Dead Zone - Iron Qon: Dam&amp;apos;ren
+or UnitBuffID(&amp;quot;target&amp;quot;,143593) --Defensive Stance - General Nagrazim
+or UnitBuffID(&amp;quot;target&amp;quot;,140296) --Conductive Shirld - Thunder Lord / Lightning Guardian
+or not UnitAffectingCombat(&amp;quot;Player&amp;quot;)
+then return true end
+
+--if cp&amp;gt;=5 and thp&amp;lt;=25 and rpr &amp;gt; 0 and not (pow&amp;gt;=50 or (ubid(p,ber) and pow&amp;gt;=25)) then
+--	return true
+--end
+--if cp&amp;gt;=5 and not (pow&amp;gt;=50 or (ubid(p,ber) and pow&amp;gt;=25)) and rpr &amp;gt; 0 and not ((rpr - 2) &amp;lt;= (tmp - 1)) and not ((srr - 3) &amp;lt;= (tmp - 1)) then
+--	return true
+--end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Defensive</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and not ubid(p,prl) then
+	if php&amp;lt;=50 and check(bar) then
+		cast(gsi(bar))
+	end
+	if php&amp;lt;=30 and check(mu) then
+		cast(gsi(mu))
+	end
+	if php&amp;lt;=25 and check(si) then
+		cast(gsi(si))
+	end
+	if php &amp;lt; 30 and GetItemCount(5512,false,false) &amp;gt; 0 and ( select(2, GetItemCooldown(5512)) == 0 ) then
+    	UseItemByName(5512)
+    	return true
+	end
+	if ubid(p,mu) and check(fr) then
+		cast(gsi(fr))
+		cast(gsi(cf),nil)
+	end
+end
+if UnitExists(&amp;quot;mouseover&amp;quot;) 
+	and UnitIsDeadOrGhost(&amp;quot;mouseover&amp;quot;) 
+	and UnitCanCooperate(p, &amp;quot;mouseover&amp;quot;)     
+	and not PQR_IsOutOfSight(&amp;quot;mouseover&amp;quot;)
+	and not UnitCastingInfo(p) 
+	and UnitChannelInfo(p) == nil 
+	and sir(gsi(rb),&amp;quot;mouseover&amp;quot;)==1 
+then
+	if incom and ubid(p,ps) and cd(rb)==0 then
+		cast(gsi(rb),&amp;quot;mouseover&amp;quot;)
+	else
+		cast(gsi(rv),&amp;quot;mouseover&amp;quot;)
+	end	
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Thrash (AoE)</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and pow&amp;gt;=50 and sir(gsi(mgl),t)==1 and not udbid(t,thr,p) then 
+	if HaveBuff(p,{139121,139117,139120}) and rorothr==0 then
+		cast(gsi(thr))
+		rorothr = 1
+	end
+	if not ubid(t,thr,p) then
+		cast(gsi(thr))
+	end
+end
+if not HaveBuff(p,{139121,139117,139120}) then
+	rorothr = 0
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Racials</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>---Troll Berserking
+if incom 
+	and not ubid(p,prl) 
+	and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto)
+	and pow&amp;gt;=75 
+	and check(rber) 
+	and ubid(p,sr) 
+	and ubid(p,tf) 
+	and sir(gsi(mgl),t)==1 
+then 
+	cast(gsi(rber),nil) 
+end
+
+if incom and GetInventoryItemCooldown(p,10) == 0 and ubid(p,tf) and not ubid(p, ber) then
+	UseInventoryItem(10)
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>False</SkipUnknown></Ability><Ability><Name>Symbiosis</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl &amp;gt;= 68 and outcom and SymMode==0 and select(2,IsInInstance())~=&amp;quot;none&amp;quot; then
+	if not ubid(p,sym) and cd(sym)==0 then
+		if PQR_CustomTarget ~= symmem[1].Unit then
+			PQR_CustomTarget = symmem[1].Unit
+			if PQR_CustomTarget == &amp;quot;&amp;quot; or PQR_CustomTarget == &amp;quot;player&amp;quot; then
+				return false
+			end
+		end
+		if sir(gsi(inn),PQR_CustomTarget)==1 then
+			TargetUnit(PQR_CustomTarget)
+		end
+		if UnitExists(t) and UnitCanCooperate(p,t) and (UnitInParty(t) or UnitInRaid(t)) and not pcasting then
+			symcast = 1
+			cast(gsi(sym),PQR_CustomTarget)
+		end		
+	end
+	if symcast==1 and not pcasting and HaveBuff(&amp;quot;target&amp;quot;,{110478, 110479, 110482, 110483, 110484, 110485, 110486, 110488, 110490, 110491}) then
+		symcast = 0
+		ClearTarget()
+	end	
+end
+
+if ubid(p,sym) and incom and not IsStealthed() then
+	if IsUsableSpell(symwar) and cd(symwar)==0 and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto) then
+		cast(gsi(symwar))
+	end
+	if IsUsableSpell(symsha) and cd(symsha)==0 and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto) then
+		cast(gsi(symsha))
+	end
+	if IsUsableSpell(sympri) and cd(sympri)==0 and php&amp;lt;=25 then
+		cast(gsi(sympri))
+	end
+	if IsUsableSpell(sympal) and cd(sympal)==0 and php&amp;lt;=25 then
+		cast(gsi(sympal))
+	end
+	if IsUsableSpell(symdk) and sir(gsi(rk),t)~=1 and sir(gsi(rc),t)==1 and pow&amp;gt;=40 then
+		cast(gsi(symdk))
+	end
+	if IsUsableSpell(symhun) and cd(symhun)==0 then
+		threat={UnitDetailedThreatSituation(p,t)}
+		if (threat[1]==1 or (threat[5] ~=nil and threat[5]&amp;gt;25000 and threat[3]&amp;gt;90)) then
+			cast(gsi(symhun))
+		end
+	end
+	if IsUsableSpell(symloc) then
+	
+	end
+	if IsUsableSpell(symrog) then
+		if cps == nil then
+			cps = 0
+		end
+		if outcom then
+			csp = 0
+		end
+		local ComboPoints = GetComboPoints(&amp;quot;player&amp;quot;, &amp;quot;target&amp;quot;)
+		if UnitExists(t) and ComboPoints ~= cps and check(symrog) and cps~=0 then
+   			cast(gsi(symrog),t)
+		end
+	end
+	if IsUsableSpell(symmag) and cd(symmag)==0 and php&amp;lt;=25 then
+		cast(gsi(symmag))
+	end
+	if IsUsableSpell(symmon) then
+		
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Custom</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>PQIInit</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if CuteOneFeral then 
+    return false 
+end 
+
+local configgen = { 
+    name = &amp;quot;General&amp;quot;, 
+    author = &amp;quot;CuteOne&amp;quot;, 
+    abilities = { 
+        { 
+            name = &amp;quot;Cooldowns&amp;quot;, 
+            enable = true, 
+            tooltip    = &amp;quot;Enable for Cooldown usage of abilities with long cooldowns.&amp;quot;, 
+        }, 
+        { 	
+            name = &amp;quot;Tier 90 Talents&amp;quot;, 
+            enable = true, 
+            tooltip    = &amp;quot;Enable for Automatic Tier 90 Talent useage.&amp;quot;, 
+            newSection = true, -- Creates a new section 
+        }, 
+        { 
+            name = &amp;quot;Tier 60 Talents&amp;quot;, 
+            enable = true, 
+            tooltip    = &amp;quot;Enable Automatic Tier 60 Talent useage.&amp;quot;, 
+            newSection = true, -- Creates a new section 
+        }, 
+        { 
+            name = &amp;quot;Racials&amp;quot;, 
+            enable = true, 
+            tooltip    = &amp;quot;Enable Auto Racials useage.&amp;quot;, 
+            newSection = true, 
+        }, 
+        { 
+            name = &amp;quot;Trinket 13&amp;quot;, 
+            enable = true, 
+            tooltip    = &amp;quot;Enable Auto Trinket 13 useage.&amp;quot;, 
+        }, 
+        { 
+            name = &amp;quot;Trinket 14&amp;quot;, 
+            enable = true, 
+            tooltip    = &amp;quot;Enable Auto Trinket 14 useage.&amp;quot;, 
+        }, 
+        { 
+            name = &amp;quot;Gloves&amp;quot;, 
+            enable = true, 
+            tooltip    = &amp;quot;Enable Auto Gloves useage.&amp;quot;, 
+        }, 
+        { 
+            name = &amp;quot;Potion&amp;quot;, 
+            enable = true, 
+            tooltip    = &amp;quot;Enable Auto Potion useage.&amp;quot;, 
+        }, 
+        { 
+            name = &amp;quot;HealthStone&amp;quot;, 
+            enable = true, 
+            tooltip    = &amp;quot;Automatic Health Stone on Health Percentage.&amp;quot;, 
+            widget = { 
+                type = &amp;quot;numBox&amp;quot;, 
+                value = 40, -- Default Value to use healthstone 
+                min = 10, 
+                max = 100, 
+                step = 5, -- how many intervals to change value 
+            }, 
+            newSection = true, -- Creates a new section 
+        }, 
+        { 
+            name = &amp;quot;Interrupt&amp;quot;, 
+            enable = true, 
+            tooltip = &amp;quot;Enable for Auto interrupt Spells.&amp;quot;, 
+        }, 
+    }, 
+    hotkeys = { 
+        { 
+            name = &amp;quot;Cooldowns&amp;quot;, 
+            enable = false, 
+            tooltip    = &amp;quot;Will do whatever!&amp;quot;, 
+            hotkeys = { 
+                &amp;apos;la&amp;apos;, 
+            }, 
+        }, 
+        { 
+            name = &amp;quot;Tier 90 Key&amp;quot;, 
+            enable = true, 
+            tooltip    = &amp;quot;Will cast your Tier 90 talent.&amp;quot;, 
+            hotkeys = { 
+                &amp;apos;lc&amp;apos;, 
+            }, 
+        }, 
+        { 
+            name = &amp;quot;Tier 60 Key&amp;quot;, 
+            enable = true, 
+            tooltip    = &amp;quot;Will cast your Tier 60 talent.&amp;quot;, 
+            hotkeys = { &amp;apos;lc&amp;apos;,
+                 
+            }, 
+        }, 
+        { 
+            name = &amp;quot;Tier 45 Key&amp;quot;, 
+            enable = true, 
+            tooltip    = &amp;quot;Will cast your Tier 45 talent.&amp;quot;, 
+            hotkeys = { &amp;apos;lc&amp;apos;,
+                 
+            }, 
+        }, 
+        { 
+            name = &amp;quot;Toggle Hybrid Rotation&amp;quot;, 
+            enable = true, 
+            tooltip    = &amp;quot;Will do Something!&amp;quot;, 
+            hotkeys = { 
+                &amp;apos;ra&amp;apos;,&amp;apos;ls&amp;apos;, 
+            }, 
+        }, 
+        { 
+            name = &amp;quot;Toggle AOE Rotation&amp;quot;, 
+            enable = true, 
+            tooltip    = &amp;quot;Toggle AOE Rotation.&amp;quot;, 
+            hotkeys = { 
+                &amp;apos;rs&amp;apos; 
+            }, 
+        }, 
+        { 
+            name = &amp;quot;Pause Key&amp;quot;, 
+            enable = true, 
+            hotkeys = { 
+                &amp;apos;ls&amp;apos;, 
+            }, 
+        }, 
+    }, 
+} 
+
+CuteOneFeral = PQI:AddRotation(configgen)
+
+
+local configferalhp = { 
+    name = &amp;quot;Feral HP&amp;quot;, 
+    author = &amp;quot;CuteOne&amp;quot;, 
+    abilities = { 
+    },
+    }
+    
+CuteOneFeral = PQI:AddRotation(configferalhp)</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Remove Corruption</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>--if ValidDispel(p) and cd(rc)==0 and not and cp &amp;gt; 0 and pow&amp;gt;=35 and select(2,GetInstanceInfo())~=&amp;quot;arena&amp;quot; and select(2,GetInstanceInfo())~=&amp;quot;pvp&amp;quot; then
+--	cast(gsi(rc),p)
+--end
+--if ValidDispel(&amp;quot;mouseover&amp;quot;) and cd(rc)==0 then
+--	cast(gsi(rc),&amp;quot;mouseover&amp;quot;)
+--end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Single Override</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if AOEMode == 0 then
+	rotchange = 1
+end
+if AOEMode ~= 0 and rotchange==0 then
+	PQ_AOE = false
+	AOEMode = 0
+	PQ_Rot = &amp;quot;Single&amp;quot;
+	Nova_Notify(&amp;quot;|cff347C2CAOE Mode: |cffDC143CSingle|cffffffff&amp;quot;)
+	--PQR_WriteToChat(&amp;quot;|cff347C2CAOE Mode: |cffDC143CSingle|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	rotchange = 1
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Multi Override</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if rotchange == nil then
+	rotchange = 0
+end
+if AOEMode == 2 then
+	rotchange = 1
+end
+if AOEMode ~= 2 and rotchange==0 then
+	PQ_AOE = true
+	AOEMode = 2
+	PQ_Rot = &amp;quot;Multi&amp;quot;
+	PQR_WriteToChat(&amp;quot;|cff347C2CAOE Mode: |cff006400Multi|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	rotchange = 1
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Cyclone</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if UnitExists(&amp;quot;focus&amp;quot;) and sir(gsi(cy),&amp;quot;focus&amp;quot;)==1 and cd(cy)==0 then
+	cast(gsi(cy),&amp;quot;focus&amp;quot;)
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Clearcasting</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and ubid(p,cc) and sir(gsi(mgl),t)==1 and ubid(p,cf) then
+	if check(rp) and cp==5 and (rpr &amp;lt; 6 or (rpp &amp;gt; 108 and (rscbuff==0 or rscbuff&amp;gt;=7))) then
+		cast(gsi(rp))
+	elseif plvl&amp;gt;=28 and thrr &amp;lt; 3 and ttd(t)&amp;gt;=6 then
+		cast(gsi(thr))
+	elseif check(rk) and (rkr &amp;lt; 3 or ((ttd(t) - rkr) &amp;gt; 3 and ((crkd * (rkd + 1)) - (rkd * (rkr / 3))) &amp;gt; mgld)) then
+		cast(gsi(rk))
+	elseif cp&amp;lt;=5 then
+		if AOEMode==0 then
+			if behind==true then
+				cast(gsi(shr))
+			else
+				cast(gsi(mgl))
+			end
+		else
+			cast(gsi(sw))
+		end
+	end
+end
+--if incom and ubid(p,cc) and ubid(p,bf) then
+--	if thrr&amp;lt;=3 and cd(thb)==0 then
+--		cast(gsi(thb))
+--	elseif pow &amp;gt; 50 and cd(ml)==0 then
+--		cast(gsi(ml))
+--	elseif
+--		cast(gsi(swb))
+--	end
+--end
+
+--if incom and ubid(p,cc) and sir(gsi(mgl),t)==1 and ubid(p,cf) then
+--	if plvl&amp;gt;=28 and thrr &amp;lt; 3 and ttd(t)&amp;gt;=6 then
+--		cast(gsi(thr))
+--	else
+--		if (ttd(t) - rkr) &amp;gt; 3 and (crkd*((rkr/3)+1)-rkd*(rkr/3)) &amp;gt; mgld then
+--			cast(gsi(rk))
+--		else
+--			if ((ubid(p,cc) or pow&amp;gt;=45) or ubid(p,ber) or repow&amp;gt;=15) and (behind==true or ((ubid(p,tf) or ubid(p,ber)) and srg==true)) then
+--				cast(gsi(shr))
+--			else
+--				if pow&amp;gt;=35 then
+--					cast(gsi(mgl))
+--				end
+--			end
+--		end
+--	end
+--end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Rejuvination</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if not IsLeftAltKeyDown() 
+and not IsMounted()
+and not SpellIsTargeting()
+and not UnitBuffID(&amp;quot;Player&amp;quot;,80169)
+and not UnitBuffID(&amp;quot;Player&amp;quot;,87959)
+and not UnitChannelInfo(&amp;quot;Player&amp;quot;) 
+and not UnitIsDeadOrGhost(&amp;quot;Player&amp;quot;) 
+and not UnitBuffID(&amp;quot;target&amp;quot;,117961)
+and (outcom or plvl&amp;lt;26) and not ubid(p,rej) and PQR_SpellAvailable(rej)
+then 
+	if php&amp;lt;=70 then --Change this value to adjust the hp percentage rejuv will cast at
+		cast(gsi(rej))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Quality of Life</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>-- Quality of Life
+if not CheckCastTime then
+	CheckCastTime = {}
+end
+
+function DelayCast(spellid, dtime) -- SpellID of Spell To Check, delay time
+	local mtime = dtime + 5 --max expire time
+	local spellexist = false
+	if dtime &amp;gt; 0 then
+		if #CheckCastTime &amp;gt; 0 then
+			for i=1, #CheckCastTime do
+				if CheckCastTime[i].SpellID == spellid then
+					spellexist = true
+					if ((GetTime() - CheckCastTime[i].CastTime) &amp;gt; mtime) then
+						--tremove(CheckCastTime, i)
+						--PQR_WriteToChat(&amp;quot;\124cFFFF55FFTime: &amp;quot;..(GetTime() - CheckCastTime[i].CastTime)) 
+						CheckCastTime[i].CastTime = GetTime()
+						return false
+					elseif ((GetTime() - CheckCastTime[i].CastTime) &amp;gt; dtime) then
+						--PQR_WriteToChat(&amp;quot;\124cFFFF55FFTime2: &amp;quot;..(GetTime() - CheckCastTime[i].CastTime)) 
+						CheckCastTime[i].CastTime = GetTime()
+						return true
+					else
+						--PQR_WriteToChat(&amp;quot;\124cFFFF55FFTime3: &amp;quot;..(GetTime() - CheckCastTime[i].CastTime)) 
+						return false
+					end
+				end
+			end
+			if not spellexist then
+				table.insert(CheckCastTime, { SpellID = spellid, CastTime = GetTime() } )	
+				return false	
+			end
+		else
+			--PQR_WriteToChat(&amp;quot;\124cFFFF55FFTime4&amp;quot;) 
+			table.insert(CheckCastTime, { SpellID = spellid, CastTime = GetTime() } )	
+			return false	
+		end
+	else
+		return true
+	end
+end
+
+--Accept Queue Pop
+if select(1,GetLFGMode())==&amp;quot;proposal&amp;quot; 
+--or StaticPopup1:IsVisible() 
+then
+	if DelayCast(99991, 5.0) then
+		PQR_WriteToChat(&amp;quot;\124cFFFF55FFAuto-accepted a JoinQueue at &amp;quot; .. date(&amp;quot;%H:%M:%S (%I:%M:%S %p) Local Time&amp;quot;))							
+		AcceptProposal() 
+		RunMacroText(&amp;quot;/run LFGDungeonReadyPopup:Hide()&amp;quot;)	
+		--RunMacroText(&amp;quot;/run StaticPopup1:Hide()&amp;quot;)	
+	end
+end
+
+--Accept Resurrection
+local bres = true 
+
+if RESURRECT:IsVisible() 
+or RESURRECT_NO_TIMER:IsVisible() 
+or RESURRECT_NO_SICKNESS:IsVisible() 
+then
+	if (GetCorpseRecoveryDelay() == 0) then
+		if ((UnitAffectingCombat(&amp;quot;target&amp;quot;)) and bres) or not (UnitAffectingCombat(&amp;quot;target&amp;quot;)) then
+			if DelayCast(99995, 5.0) then
+				PQR_WriteToChat(&amp;quot;\124cFFFF55FFAuto-accepted a Resurect at &amp;quot; .. date(&amp;quot;%H:%M:%S (%I:%M:%S %p) Local Time&amp;quot;))							
+				AcceptResurrect();
+				--StaticPopup_Hide(&amp;quot;RESURRECT_NO_TIMER&amp;quot;);
+				RunMacroText(&amp;quot;/run RESURRECT:Hide();RESURRECT_NO_TIMER:Hide();RESURRECT_NO_SICKNESS:Hide()&amp;quot;)
+			end
+		end
+	end
+end
+
+--Set Role
+local rollcheckvisible = RolePollPopup:IsVisible()
+local specIndex = GetSpecialization()
+if specIndex then
+	local _, _, _, _, _, specRole = GetSpecializationInfo(specIndex)
+end
+
+if rollcheckvisible 
+and specRole
+then
+	if DelayCast(99994, 5) then
+		UnitSetRole(&amp;quot;player&amp;quot;, specRole)
+		RunMacroText(&amp;quot;/run RolePollPopup:Hide()&amp;quot;)
+		PQR_WriteToChat(&amp;quot;\124cFFFF55FFAuto-accepted a RolePoll at &amp;quot; .. date(&amp;quot;%H:%M:%S (%I:%M:%S %p) Local Time&amp;quot;))			
+	end
+end
+local checkvisible = LFDRoleCheckPopup:IsVisible()
+local tank = LFDQueueFrameRoleButtonTank.checkButton:GetChecked()
+local healer = LFDQueueFrameRoleButtonHealer.checkButton:GetChecked()
+local dps = LFDQueueFrameRoleButtonDPS.checkButton:GetChecked()
+--RolePollPopup:IsVisible()
+
+if checkvisible 
+and (tank or healer or dps) 
+then
+	if DelayCast(99992, 5) then
+		LFDRoleCheckPopupAccept_OnClick()
+		RunMacroText(&amp;quot;/run LFDRoleCheckPopup:Hide()&amp;quot;)
+		PQR_WriteToChat(&amp;quot;\124cFFFF55FFAuto-accepted a RoleQueue at &amp;quot; .. date(&amp;quot;%H:%M:%S (%I:%M:%S %p) Local Time&amp;quot;))			
+	end
+end
+
+--Accpept Summon
+if CONFIRM_SUMMON:IsVisible() 
+and not UnitAffectingCombat(&amp;quot;player&amp;quot;)
+then
+	if DelayCast(99996, 5.0) then
+		PQR_WriteToChat(&amp;quot;\124cFFFF55FFAuto-accepted a Summon at &amp;quot; .. date(&amp;quot;%H:%M:%S (%I:%M:%S %p) Local Time&amp;quot;))							
+		ConfirmSummon()
+		RunMacroText(&amp;quot;/run CONFIRM_SUMMON:Hide()&amp;quot;)	
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Mangle (Bear)</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and ubid(p,bf) and cd(mbf)==0 and hastar then
+	cast(gsi(mbf))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Lacerate</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and ubid(p,bf) and cd(lac)==0 then
+	cast(gsi(lac))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Maul</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and ubid(p,bf) and cd(ml)==0 and pow&amp;gt;=60 then
+	cast(gsi(ml))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Spell Queue Setup</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>-- I am going to create a simple frame that will accept either SPELL ID input, or SPELL NAME input...
+-- I will try and distinguish which is being requested by simple string verifications..
+-- Spell ID will be simple in adding to the Queue system
+-- Spell Name will be slightly more complex.. Possible ideas on how to compare Spell Name against possible Spell choices
+---- We can use a predetermined table of Spell ID&amp;apos;s to accept as Spell Name inputs
+---- We can scan the entire SpellBook before we even begin and see what spells we know (Run check whenever Spec or Level changes)
+---- Still thinking about other methods
+-- I may include a Scroll Frame which will display the last X number or Queued Casts and if they were successful or not
+if not Nova_Queue_Setup then
+local function Event_Reader()
+
+	local function OnEventFunc(self, event, ...)
+		if event == &amp;quot;PLAYER_LEVEL_UP&amp;quot; or event == &amp;quot;PLAYER_TALENT_UPDATE&amp;quot; then
+			Nova_SpellBookCache = { }
+			local _, _, tabOffset, numEntries = GetSpellTabInfo(2) -- The Spell Tab 1 = General Spells, 2 = Current Spec spells
+			for i=tabOffset + 1, tabOffset + numEntries do
+				local spellName, spellSubName = GetSpellBookItemName(i, &amp;quot;spell&amp;quot;)
+				local spell = GetSpellLink(spellName)
+				if ( not spellSubName or not string.match(spellSubName, &amp;quot;Passive&amp;quot;) )
+				 and spell then
+					local SpellNameFinal = string.lower(gsub(spellName, &amp;quot;[%s%d%p]&amp;quot;, &amp;quot;&amp;quot;))
+					local string1 = gsub(spell, &amp;quot;[%a%|%s%[%]]+&amp;quot;, &amp;quot;&amp;quot;)
+					local spellIDfromString = tonumber(string.match(string1, &amp;quot;%p(%d+)&amp;quot;))
+					table.insert(Nova_SpellBookCache, { name = SpellNameFinal, id = spellIDfromString } )
+				end
+			end	
+		elseif #Nova_SpellQueueTable &amp;gt; 0 and event == &amp;quot;COMBAT_LOG_EVENT_UNFILTERED&amp;quot; then
+			if (select(2, ...) == &amp;quot;SPELL_CAST_SUCCESS&amp;quot;
+				or select(2, ...) == &amp;quot;SPELL_CAST_START&amp;quot; )
+			 and select(4, ...) == UnitGUID(&amp;quot;player&amp;quot;) then			 	
+			 	for loop = 1, #Nova_SpellQueueTable do
+			 		if Nova_SpellQueueTable[loop].id == select(12, ...) then
+			 			table.remove(Nova_SpellQueueTable, loop)
+			 			print(&amp;quot;|cff00F0F0Successfully cast|cffFF0000&amp;quot;,select(13, ...),&amp;quot;|cff00F0F0!&amp;quot;)
+			 			break
+			 		end
+			 	end
+			end
+		end
+	end
+
+
+	local eventReader = CreateFrame(&amp;quot;frame&amp;quot;, nil)
+	eventReader:RegisterEvent(&amp;quot;PLAYER_LEVEL_UP&amp;quot;)
+	eventReader:RegisterEvent(&amp;quot;PLAYER_TALENT_UPDATE&amp;quot;)
+	eventReader:RegisterEvent(&amp;quot;COMBAT_LOG_EVENT_UNFILTERED&amp;quot;)
+	eventReader:SetScript(&amp;quot;OnEvent&amp;quot;, OnEventFunc)
+
+end
+
+function CheckForValidSpell(string)
+	-- We need to figure out if we&amp;apos;re dealing with a SpellID or a Spell Name
+	local SpellIDCheck = gsub(string, &amp;quot;[%a%p%s]&amp;quot;, &amp;quot;&amp;quot;)
+	local SpellNameCheck = string.lower(gsub(string, &amp;quot;[%s%d%p]&amp;quot;, &amp;quot;&amp;quot;))
+	
+	-- First We&amp;apos;ll check the Spell ID as it is a quicker check, and return true if we successfully add
+	if string.len(SpellIDCheck) &amp;gt; 0 then
+		local SpellID = tonumber(SpellIDCheck)
+		for t=1, #Nova_SpellBookCache do
+			if SpellID == Nova_SpellBookCache[t].id then
+				if #Nova_SpellQueueTable &amp;gt; 0 then
+					for j=1, #Nova_SpellQueueTable do
+						if Nova_SpellBookCache[t].id == Nova_SpellQueueTable[j].id then
+							print(&amp;quot;|cff00F0F0Removing|cffFF0000&amp;quot;, GetSpellInfo(Nova_SpellQueueTable[j].id), &amp;quot;|cff00F0F0from the Spell Queue before it was cast!&amp;quot;)
+							table.remove(Nova_SpellQueueTable, j)
+							return false
+						end
+					end
+				end
+				table.insert(Nova_SpellQueueTable, { name = Nova_SpellBookCache[t].name, id = Nova_SpellBookCache[t].id })
+				NovaSpellQueueHistory(Nova_SpellBookCache[t].id)
+				print(&amp;quot;|cff00F0F0Successfully added |cffFF0000&amp;quot;..GetSpellInfo(Nova_SpellBookCache[t].id)..&amp;quot;|cff00F0F0 to the Spell Queue&amp;quot;)
+				return 
+			end
+		end
+	end
+
+	-- If we had a string that appeared to be an ID we&amp;apos;ll check that first, if nothign returns true, we
+	-- will then check the Spell Name and if that is a true Spell
+	if string.len(SpellNameCheck) &amp;gt; 0 then
+		for k=1, #Nova_SpellBookCache do
+			if SpellNameCheck == Nova_SpellBookCache[k].name then
+				if #Nova_SpellQueueTable &amp;gt; 0 then
+					for j=1, #Nova_SpellQueueTable do
+						if Nova_SpellBookCache[k].id == Nova_SpellQueueTable[j].id then	
+							print(&amp;quot;|cff00F0F0Removing|cffFF0000&amp;quot;, GetSpellInfo(Nova_SpellQueueTable[j].id), &amp;quot;|cff00F0F0from the Spell Queue before it was cast!&amp;quot;)
+							table.remove(Nova_SpellQueueTable, j)
+							return false
+						end
+					end
+				end
+				table.insert(Nova_SpellQueueTable, { name = Nova_SpellBookCache[k].name, id = Nova_SpellBookCache[k].id })
+				NovaSpellQueueHistory(Nova_SpellBookCache[k].id)
+				print(&amp;quot;|cff00F0F0Successfully added |cffFF0000&amp;quot;..GetSpellInfo(Nova_SpellBookCache[k].id)..&amp;quot;|cff00F0F0 to the Spell Queue&amp;quot;)
+				return 
+			end
+		end
+	else return false
+	end
+	
+	print(&amp;quot;|cffFF00FFThere wasn&amp;apos;t a Spell to go along with what your input&amp;quot;)
+	return false
+end
+
+
+function NovaSpellQueueHistory(spellID)
+	local buttonID = spellID
+	local buttonName = GetSpellInfo(buttonID)
+	local AlreadyInHistory = false
+	-- We are seeing if it&amp;apos;s already in the Spell Queue History or not
+	-- If not, we will create a new button if 6 don&amp;apos;t exists already
+	-- Or we will overwrite the oldest Spell in the History
+	for h=1, #Nova_SpellQueueHistory do
+		if buttonID == Nova_SpellQueueHistory[h].id then
+			table.sort(Nova_SpellQueueHistory, function(x) return x.id == spellID end)
+			AlreadyInHistory = true
+		end
+	end
+	if not AlreadyInHistory then
+		if #Nova_SpellQueueHistory &amp;lt;= 5 then
+				local spellButton = CreateFrame(&amp;quot;button&amp;quot;, &amp;quot;SpellQueueSystemButton&amp;quot;..tostring(#Nova_SpellQueueHistory + 1), SpellQueueSystemContent, &amp;quot;UIPanelButtonTemplate&amp;quot;)
+				spellButton:SetSize(110, 20)
+				spellButton:SetScript(&amp;quot;OnClick&amp;quot;, function(self) 
+					CheckForValidSpell(self:GetText())
+				end)
+				table.insert(Nova_SpellQueueHistory, 1, {name=buttonName, id=buttonID, button=spellButton}) 
+		elseif #Nova_SpellQueueHistory == 6 then
+				Nova_SpellQueueHistory[6].id = buttonID
+				Nova_SpellQueueHistory[6].name = buttonName
+				table.sort(Nova_SpellQueueHistory, function(x) return x.id == spellID end)
+		end
+	end
+	
+	local startPointX, startPointY = 10, 5
+	for i=1, #Nova_SpellQueueHistory do
+		local ButtonSetting = Nova_SpellQueueHistory[i].button
+		ButtonSetting:SetText(Nova_SpellQueueHistory[i].name)
+		ButtonSetting:ClearAllPoints()
+		if i &amp;lt;= 3 then
+			ButtonSetting:SetPoint(&amp;quot;TOPLEFT&amp;quot;, SpellQueueSystemContent, &amp;quot;TOPLEFT&amp;quot;, startPointX, - (startPointY + (24 * (i-1))))
+		else
+			ButtonSetting:SetPoint(&amp;quot;TOPRIGHT&amp;quot;, SpellQueueSystemContent, &amp;quot;TOPRIGHT&amp;quot;, - startPointX , - (startPointY + (24 * (i-4))))
+		end
+	end
+end
+
+function Nova_Queue_Setup()
+
+	Nova_SpellBookCache = { }
+	Nova_SpellQueueTable = { }
+	Nova_SpellQueueHistory = { }
+	local _, _, tabOffset, numEntries = GetSpellTabInfo(2) -- The Spell Tab 1 = General Spells, 2 = Current Spec spells
+	for i=tabOffset + 1, tabOffset + numEntries do
+		local spellName, spellSubName = GetSpellBookItemName(i, &amp;quot;spell&amp;quot;)
+		local spell = GetSpellLink(spellName)
+		if ( not spellSubName or not string.match(spellSubName, &amp;quot;Passive&amp;quot;) )
+		 and spell then
+			local SpellNameFinal = string.lower(gsub(spellName, &amp;quot;[%s%d%p]&amp;quot;, &amp;quot;&amp;quot;))
+			local string1 = gsub(spell, &amp;quot;[%a%|%s%[%]]+&amp;quot;, &amp;quot;&amp;quot;)
+			local spellIDfromString = tonumber(string.match(string1, &amp;quot;%p(%d+)&amp;quot;))
+			table.insert(Nova_SpellBookCache, { name = SpellNameFinal, id = spellIDfromString } )
+		end
+	end	
+
+	-- Title
+	local frameTitle = CreateFrame(&amp;quot;frame&amp;quot;, &amp;quot;SpellQueueSystemTitle&amp;quot;, UIParent)
+	frameTitle:ClearAllPoints()
+	frameTitle:SetSize(120, 27)	
+	frameTitle:SetMovable(true)
+	frameTitle:EnableMouse(true)
+	frameTitle:RegisterForDrag(&amp;quot;LeftButton&amp;quot;)
+	frameTitle:SetScript(&amp;quot;OnDragStart&amp;quot;, frameTitle.StartMoving)
+	frameTitle:SetScript(&amp;quot;OnDragStop&amp;quot;, frameTitle.StopMovingOrSizing)
+	frameTitle:SetScript(&amp;quot;OnShow&amp;quot;, RefreshFrameBoxes)
+	local TitleString = frameTitle:CreateFontString(&amp;quot;TitleString&amp;quot;)
+	TitleString:SetFontObject(&amp;quot;GameTooltipText&amp;quot;)
+	TitleString:SetText(&amp;quot;Spell Queue System&amp;quot;)
+	TitleString:SetJustifyH(&amp;quot;CENTER&amp;quot;)
+	TitleString:SetJustifyV(&amp;quot;CENTER&amp;quot;)
+	TitleString:ClearAllPoints()
+	TitleString:SetPoint(&amp;quot;TOPLEFT&amp;quot;, SpellQueueSystemTitle, &amp;quot;TOPLEFT&amp;quot;)
+	TitleString:SetPoint(&amp;quot;BOTTOMRIGHT&amp;quot;, SpellQueueSystemTitle, &amp;quot;BOTTOMRIGHT&amp;quot;)
+	frameTitle:SetBackdrop({bgFile = &amp;quot;Interface/Tooltips/UI-Tooltip-Background&amp;quot;, 
+																edgeFile = &amp;quot;Interface/Tooltips/UI-Tooltip-Border&amp;quot;, 
+																tile = true, tileSize = 16, edgeSize = 16, 
+																insets = { left = 4, right = 4, top = 4, bottom = 4 }});
+	frameTitle:SetBackdropColor(0,0,0,1);
+	frameTitle:SetPoint(&amp;quot;CENTER&amp;quot;, -300, 100)
+	frameTitle:Show()
+	
+	
+	-- Main Frame that we shall link everything to
+	local frameMain = CreateFrame(&amp;quot;frame&amp;quot;, &amp;quot;SpellQueueSystem&amp;quot;, SpellQueueSystemTitle)
+	frameMain:ClearAllPoints()
+	frameMain:SetSize(260, 115)
+	frameMain:SetBackdrop({bgFile = &amp;quot;Interface/Tooltips/UI-Tooltip-Background&amp;quot;, 
+																edgeFile = &amp;quot;Interface/Tooltips/UI-Tooltip-Border&amp;quot;, 
+																tile = true, tileSize = 16, edgeSize = 16, 
+																insets = { left = 4, right = 4, top = 4, bottom = 4 }});
+	frameMain:SetBackdropColor(0,0,0,1);
+	frameMain:SetPoint(&amp;quot;TOP&amp;quot;, SpellQueueSystemTitle, &amp;quot;BOTTOM&amp;quot;, 0, -2)
+	frameMain:Show()
+
+
+
+
+	-- Close/Hide Button
+	local frameClose = CreateFrame(&amp;apos;Button&amp;apos;, &amp;apos;SpellQueueSystemClose&amp;apos;, frameMain)
+	frameClose:ClearAllPoints()
+	frameClose:SetPoint(&amp;quot;BOTTOMRIGHT&amp;quot;, frameMain, &amp;quot;TOPRIGHT&amp;quot;, 0, 4)
+	frameClose:RegisterForClicks(&amp;quot;LeftButtonDown&amp;quot;)
+	frameClose:SetSize(20, 20)
+	local closeText = frameClose:CreateFontString(&amp;quot;closeText&amp;quot;)
+	closeText:SetFontObject(&amp;quot;GameTooltipTextSmall&amp;quot;)
+	closeText:SetText(&amp;quot;|cFFFFFAFA X|cffffffff&amp;quot;)
+	closeText:ClearAllPoints()
+	closeText:SetAllPoints(frameClose)
+	closeText:SetJustifyH(&amp;quot;CENTER&amp;quot;)
+	closeText:SetJustifyV(&amp;quot;CENTER&amp;quot;)
+	frameClose:SetScript(&amp;apos;OnClick&amp;apos;, function() frameTitle:Hide() end )
+	frameClose:SetBackdrop({ 
+									edgeFile = &amp;quot;Interface/Tooltips/UI-Tooltip-Border&amp;quot;, 
+									tile = false, tileSize = 12, edgeSize = 12, 
+									insets = { left = 6, right = 6, top = 6, bottom = 6 }
+									})
+	frameClose:Show()
+	
+	-- Content Frame
+	local frameContent = CreateFrame(&amp;quot;frame&amp;quot;, &amp;quot;SpellQueueSystemContent&amp;quot;, frameMain)
+	frameContent:ClearAllPoints()
+	frameContent:SetPoint(&amp;quot;TOPLEFT&amp;quot;, frameMain, &amp;quot;TOPLEFT&amp;quot;, 5, -28)
+	frameContent:SetPoint(&amp;quot;BOTTOMRIGHT&amp;quot;, frameMain, &amp;quot;BOTTOMRIGHT&amp;quot;, -5, 5)
+	frameContent:SetBackdrop({bgFile = &amp;quot;Interface/Tooltips/UI-Tooltip-Background&amp;quot;, 
+																edgeFile = &amp;quot;Interface/Tooltips/UI-Tooltip-Border&amp;quot;, 
+																tile = true, tileSize = 8, edgeSize = 8, 
+																insets = { left = 4, right = 4, top = 4, bottom = 4 }});
+	frameContent:SetBackdropColor(0,0,0,1);
+	
+	-- EditBox
+	local frameEditbox = CreateFrame(&amp;quot;Editbox&amp;quot;, &amp;quot;SpellQueueSystemEditbox&amp;quot;, frameMain, &amp;quot;InputBoxTemplate&amp;quot;)
+	frameEditbox:SetSize(180, 18)
+	frameEditbox:ClearAllPoints()
+	frameEditbox:SetAutoFocus(false)
+	frameEditbox:ClearFocus()
+	frameEditbox:SetPoint(&amp;quot;BOTTOMLEFT&amp;quot;, frameContent, &amp;quot;TOPLEFT&amp;quot;, 8, 4)
+	frameEditbox:SetScript(&amp;quot;OnEnterPressed&amp;quot;, function(self) 
+		CheckForValidSpell(self:GetText())
+		self:SetText(&amp;quot;&amp;quot;)
+		self:ClearFocus() 
+	end)
+	frameEditbox:SetScript(&amp;quot;OnEscapePressed&amp;quot;, function(self) self:SetText(&amp;quot;&amp;quot;); self:ClearFocus() end)
+
+	-- Accept Button
+	local frameAccept = CreateFrame(&amp;quot;Button&amp;quot;, &amp;quot;SpellQueueSystemAccept&amp;quot;, frameEditbox, &amp;quot;UIPanelButtonTemplate&amp;quot;)
+	frameAccept:SetBackdrop({edgeFile = &amp;quot;Interface/Tooltips/UI-Tooltip-Border&amp;quot;, 
+							tile = true, tileSize = 8, edgeSize = 8, 
+							insets = { left = 4, right = 4, top = 4, bottom = 4 }});
+	frameAccept:SetBackdropBorderColor(1,1,1,1);
+	frameAccept:SetNormalFontObject(&amp;quot;GameTooltipText&amp;quot;)
+	frameAccept:SetText(&amp;quot;Accept&amp;quot;)
+	frameAccept:SetSize(60, 18)
+	frameAccept:SetPoint(&amp;quot;BOTTOMRIGHT&amp;quot;, frameContent, &amp;quot;TOPRIGHT&amp;quot;, 0, 4)
+	frameAccept:SetScript(&amp;quot;OnClick&amp;quot;, function() 
+		CheckForValidSpell(frameEditbox:GetText())
+		frameEditbox:SetText(&amp;quot;&amp;quot;)
+		frameEditbox:ClearFocus() 
+	end)
+
+	Event_Reader()
+	
+
+
+end
+end
+
+SLASH_NOVASPELLQUEUE1 = &amp;quot;/novaspell&amp;quot;
+function SlashCmdList.NOVASPELLQUEUE(spellText, editbox)
+	if issecure() then
+		CheckForValidSpell(spellText)
+	else
+		print(&amp;quot;Not Secure to use the Slash Commands, use Frame from now on, until you can /console reloadui&amp;quot;)
+	end
+end
+
+if not Setup then
+	Nova_Queue_Setup()
+	
+	SLASH_NOVASPELLFRAME1 = &amp;quot;/nsq&amp;quot;
+	function SlashCmdList.NOVASPELLFRAME(spellText, editbox)
+		if not _G.SpellQueueSystemTitle:IsVisible() then
+			_G.SpellQueueSystemTitle:Show()
+		else
+			_G.SpellQueueSystemTitle:Hide()
+		end
+	end
+	
+	RunMacroText(&amp;quot;/novaspell firstrun&amp;quot;)
+	Setup = true
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Cast Spell Queue</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if #Nova_SpellQueueTable &amp;gt; 0 then
+	for i=1, #Nova_SpellQueueTable do
+		spell = Nova_SpellQueueTable[i].id
+		if select(2, GetSpellCooldown(spell)) == 0 
+		 or ( ( GetSpellCooldown(spell) + select(2, GetSpellCooldown(spell)) - GetTime() ) &amp;lt; 0.5 ) then
+		 				SpellCancelQueuedSpell() -- Blizzard Function, not related to my Frame
+				CastSpellByName(GetSpellInfo(spell))
+		end
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Tier 4</Name><Default>false</Default><SpellID>106737</SpellID><Actions></Actions><Lua>-- Incarnation: King of the Jungle
+if incom 
+	and not ubid(p,prl) 
+	and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto)
+	and ubid(p,ber)
+	and check(inc) 
+	and ubid(p,sr) 
+	and ubid(p,tf) 
+	and sir(gsi(mgl),t)==1 
+	and ttd(t)&amp;gt;=15 
+then 
+	cast(gsi(inc)) 
+end
+
+--Force of Nature
+local fonchrg = GetSpellCharges(fon)	--Force of Nature Charges
+if incom
+	and not ubid(p,prl) 
+	--and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto)
+	and cd(fon)==0
+	and sir(gsi(mgl),t)==1
+then
+	if fonchrg == 3 and rrr==0 and rscr==0 and Nova_CheckLastCast(fon,1) then
+		cast(gsi(fon)) 
+	end
+	if ((rscr &amp;lt; 5 and rscbuff==10) or (rrr &amp;gt; 0 and rrr &amp;lt; 1)) and fonchrg &amp;gt; 0 then
+		cast(gsi(fon))
+	end
+	if ttd(t) &amp;lt; 20 and fonchrg &amp;gt; 0 then
+		cast(gsi(fon))
+	end
+end</Lua><RecastDelay>10000</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Tier 6</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>-- Heart of the Wild
+if ubid(p,how) then
+	if check(mf) and not udbid(t,mf) then
+		cast(gsi(mf))
+	elseif check(wth) then
+		cast(gsi(wth))
+	end
+end
+
+-- Nature&amp;apos;s Vigil
+if incom 
+	and not ubid(p,prl) 
+	and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto)
+	and pow&amp;gt;=75 
+	and check(nv) 
+	and ubid(p,sr) 
+	and ubid(p,tf) 
+	and sir(gsi(mgl),t)==1 
+	and ttd(t)&amp;gt;=15 
+then 
+	cast(gsi(nv)) 
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability></DRUID>

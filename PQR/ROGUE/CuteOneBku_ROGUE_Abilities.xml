@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="utf-8" ?><ROGUE><Ability><Name>Initial</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if PQR_RotationStarted == true then
+  	PQR_RotationStarted = false
+  	if PQR_LoadLua ~= nil then
+   		if PQR_LoadLua(&amp;quot;PQR_CuteOne.lua&amp;quot;) == false then 
+      		PQR_WriteToChat(&amp;quot;Put PQR_CuteOne.lua in the data folder.&amp;quot;, &amp;quot;Error&amp;quot;)
+      		PQR_StopRotation()
+       		return true
+  		end
+  	end
+end
+	
+------VARIABLES------
+shcom()
+TricksInfo()
+timecheck()
+--RupInfo()
+if not pickpocketCheck then
+	pickpocketCheck = CreateFrame(&amp;quot;Frame&amp;quot;)
+end
+local ppframe = pickpocketCheck
+ppframe:RegisterEvent(&amp;quot;UI_ERROR_MESSAGE&amp;quot;)
+ppframe:SetScript(&amp;quot;OnEvent&amp;quot;, function(self, event, ...)
+	local msg = select(1, ...)
+	--PQR_Event(&amp;quot;PQR_Text&amp;quot;,...)
+	if (msg:find(&amp;quot;No pockets to pick&amp;quot;) ~= nil) or (msg:find(&amp;quot;Your target has already had its pockets picked&amp;quot;) ~= nil) or (msg:find(&amp;quot;There is no loot&amp;quot;) ~= nil) then
+		picked=true
+	else
+		picked=false
+	end
+end)
+--Dummy 5min DPS Test
+if cTime &amp;gt;= 300 and dummy(&amp;quot;target&amp;quot;) then  
+	StopAttack()
+	ClearTarget()
+	print(&amp;quot;5 Minute Dummy Test Concluded - Profile Stopped&amp;quot;)
+	--PQR_StopRotation()
+end
+
+------ABILITIES-------
+amb	=	8676	--Ambush
+bli	=	2094	--Blind
+csh	=	1833	--Cheap Shot
+cos	=	31224	--Cloak of Shadows
+crm	=	121411	--Crimson Tempest
+dth	=	266779	--Deadly Throw
+dtp	=	1842	--Disarm Trap
+dmt	=	51722	--Dismantle
+dis	=	111240	--Dispatch
+dtr	=	1725	--Distract
+env	=	32645	--Envenom
+eva =	5277	--Evasion
+exa	=	8647	--Expose Armor
+fok	=	51723	--Fan of Knives
+fnt	=	1966	--Feint
+gar	=	703		--Garrote
+gou	=	1776	--Gouge
+kik	=	1766	--Kick
+ksh	=	408		--Kidney Shot
+mut	=	1329	--Mutilate
+plk	=	1804	--Pick Lock
+ppk	=	920		--Pick Pocket
+prp	=	14185	--Preparation
+rec = 	73651	--Recuperate
+red	=	73981	--Redirect
+rup = 	1943	--Rupture
+sap	=	6770	--Sap
+shb	=	121471	--Shadow Blades
+shw	=	114842	--Shadow Walk
+shv	=	5938	--Shiv
+soc	=	114018	--Shroud of Concealment
+snd	=	5171	--Slice and Dice
+smb	=	76577	--Smoke Bomb
+spr	=	2983	--Sprint
+sth	=	1784	--Stealth
+thr	=	121733	--Throw
+tot	=	57934	--Trick of the Trade
+van	=	1856	--Vanish
+ven	=	79140	--Vendetta
+
+------POISONS------
+dpo	=	2823	--Deadly Poison
+wpo	=	8679	--Wound Poison
+cpo	=	3408	--Crippling Poison
+mpo	=	5761	--Mind-numbing Poison
+lpo	=	108211	--Leaching Poison
+
+------PROCS------
+bls	=	121153	--Blindside
+ant =	115189 	--Anticipation
+
+------BUFFS/DEBUFFS TRACKING------
+if udbid(t,rup,p) then
+	rupr = (select(7, udbid(t,rup,p)) - GetTime())
+else
+	rupr = 0
+end
+if ubid(p,env) then
+	envr = (select(7, ubid(p,env)) - GetTime())
+else
+	envr = 0
+end
+if ubid(p,snd) then
+	sndr = (select(7, ubid(p,snd)) - GetTime())
+else
+	sndr = 0
+end
+if ubid(p, ant) then
+	antstack = select(4,ubid(p,ant))
+else
+	antstack = 0
+end
+vstart, vduration = cd(van)
+vancdr = vstart + vduration - GetTime()
+if ubid(p, van) or ubid(p, 11327) then
+	if ubid(p,van) then
+		vanr = (select(7,ubid(p,van)) - GetTime())
+	end
+	if ubid(p,11327) then
+		vanr = (select(7,ubid(p,11327)) - GetTime())
+	end
+else
+	vanr = 0
+end
+vens, vend = cd(ven)
+vencdr = vens + vend - GetTime()
+if udbid(t,ven,p) then
+	venr = (select(7, udbid(t,ven,p)) - GetTime())
+else
+	venr = 0
+end
+if ubid(p,shb) then
+	shbr = (select(7, ubid(p,shb)) - GetTime())
+else
+	shbr = 0
+end
+
+------ETC------
+if ccp==nil then
+	ccp = 0
+end
+if fcp==nil then
+	fcp = 0
+end
+if ctar==nil then
+	ctar = 0
+end
+if ftar==nil then
+	ftar = 0
+end
+if opentime==nil then
+	opentime = 0
+end
+
+-- CD Switch
+if PQ_CDMode==nil then
+	PQ_CDMode = &amp;quot;Boss&amp;quot;
+end
+if IsRightControlKeyDown() and not GetCurrentKeyBoardFocus() and GetTime() - PQ_CDTimer &amp;gt; 0.25 then
+	PQ_CDTimer = GetTime()
+	
+	if not PQ_CD then
+		PQ_CD = CD_BossOnly
+		PQ_CDMode = &amp;quot;Boss&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CCooldown Mode: |cff79BAECBoss Only|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	elseif PQ_CD == CD_BossOnly then
+		PQ_CD = CD_Auto
+		PQ_CDMode = &amp;quot;On&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CCooldown Mode: |cff006400On|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	else
+		PQ_CD = false
+		PQ_CDMode = &amp;quot;Off&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CCooldown Mode: |cffDC143COff|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	end
+end
+
+-- AoE/Single Switch
+if AOEMode == nil then
+	AOEMode = 0
+end 
+if PQ_Rot == nil then
+	PQ_Rot = &amp;quot;Single&amp;quot;
+end
+
+if IsRightShiftKeyDown() and not GetCurrentKeyBoardFocus() and GetTime() - PQ_AOETimer &amp;gt; 0.25 then
+	PQ_AOETimer = GetTime()
+	
+	if PQ_AOE then
+		PQ_AOE = false
+		AOEMode = 0
+		PQ_Rot = &amp;quot;Single&amp;quot;
+		PQR_SwapRotation(&amp;quot;Ass-Single (CuteOne)&amp;quot;)
+	elseif AOEMode==0 then
+		PQ_AOE = false
+		AOEMode = 1
+		PQ_Rot = &amp;quot;Multi less than 3&amp;quot;
+		PQR_SwapRotation(&amp;quot;Ass-Multi (CuteOne)&amp;quot;)
+	elseif AOEMode==1 then
+		PQ_AOE = true
+		AOEMode = 2
+		PQ_Rot = &amp;quot;Multi more than 3&amp;quot;
+		--PQR_SwapRotation(&amp;quot;Ass-Multi (CuteOne)&amp;quot;)
+	end
+end
+
+-- Pick Pocket Switch
+if PQ_PPMode==nil then
+	PQ_PPMode = &amp;quot;Auto&amp;quot;
+end
+if IsRightAltKeyDown() and not GetCurrentKeyBoardFocus() and GetTime() - PQ_PPTimer &amp;gt; 0.25 then
+	PQ_PPTimer = GetTime()
+	
+	if not PQ_PP then
+		PQ_PP = PP_Auto
+		PQ_PPMode = &amp;quot;Auto&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CPick Pocket Mode: |cff006400Auto|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	elseif PQ_PP == PP_Auto then
+		PQ_PP = PP_Only
+		PQ_PPMode = &amp;quot;Only&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CPick Pocket Mode: |cff79BAECPick Pocket Only|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+		
+	else
+		PQ_PP = false
+		PQ_PPMode = &amp;quot;Off&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CPick Pocket Mode: |cffDC143COff|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	end
+end
+
+if not hastar then
+	picked = false
+end 
+
+PQR_Event(&amp;quot;PQR_Text&amp;quot;,&amp;apos;CD-Mode: &amp;apos;..PQ_CDMode..&amp;apos; --- &amp;apos;..&amp;apos;AOE-Mode: &amp;apos;..PQ_Rot..&amp;apos; --- &amp;apos;..&amp;apos;Pick Pocket &amp;apos;..PQ_PPMode)
+SymMem()
+ttd(&amp;quot;target&amp;quot;)</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Poisons</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if not IsMounted() then
+	if not ubid(p,dpo) and not (pcasting or pchannel) then
+		if select(1,UnitCastingInfo(p)) == select(1,GetSpellInfo(dpo)) then
+			return false
+		else
+			cast(gsi(dpo),nil)
+		end
+	end
+	if select(1,UnitCastingInfo(p)) == select(1,GetSpellInfo(dpo)) and ubid(p,dpo) then
+		SpellStopCasting()
+	end
+	if not ubid(p,lpo) and ubid(p,dpo) and not (pcasting or pchannel) then
+		if select(1,UnitCastingInfo(p))==select(1,GetSpellInfo(lpo)) then
+			return false
+		else
+			cast(gsi(lpo),nil)
+		end
+	end
+	if select(1,UnitCastingInfo(p)) == select(1,GetSpellInfo(lpo)) and ubid(p,lpo) then
+		SpellStopCasting()
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Pause</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if outcom and cp &amp;gt; 0 and php &amp;lt; 100 then
+	cast(gsi(rec),p)
+end
+if IsLeftAltKeyDown() 
+or IsMounted()
+or SpellIsTargeting()
+or not UnitExists(&amp;quot;Target&amp;quot;)
+or UnitBuffID(&amp;quot;Player&amp;quot;,80169)
+or UnitBuffID(&amp;quot;Player&amp;quot;,87959)
+or UnitChannelInfo(&amp;quot;Player&amp;quot;) 
+or UnitIsDeadOrGhost(&amp;quot;Player&amp;quot;) 
+or UnitIsDeadOrGhost(&amp;quot;Target&amp;quot;)
+or not UnitAffectingCombat(&amp;quot;Player&amp;quot;)
+--or (UnitBuffID(&amp;quot;Player&amp;quot;,69369) or UnitBuffID(&amp;quot;Player&amp;quot;,132158))
+then return true end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Mutilate</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>--if ubid(p,sth) and picked==false and incom and PQ_PPMode~=&amp;quot;Off&amp;quot; then
+--	RunMacroText(&amp;quot;/cast Pick Pocket&amp;quot;)
+--	PQR_DelayRotation(0.5) 
+--end
+--if ubid(p,sth) and picked==true and incom then
+--	cast(gsi(amb))
+--end
+--if AOEMode==0 and opener==0 and not ubid(p,sth) and not ubid(p,bls) and pow&amp;gt;=55 and check(mut) and thp&amp;gt;=35 then
+--	cast(gsi(mut),t)
+--end
+
+if pow&amp;gt;=55 and AOEMode==0 then
+	if (ubid(p,van) or ubid(p,11327)) and cd(van) &amp;gt; 119.5 then 
+		cast(gsi(mut),t)
+	end
+	if cp &amp;lt; 5 or (envr &amp;gt; 2 and antstack &amp;lt; 3) then 
+		cast(gsi(mut),t)
+	end
+	if thp &amp;gt; 35 and pow &amp;gt; 90 then	
+		cast(gsi(mut), t)		
+	end
+end
+if pow&amp;gt;=55 and AOEMode==1 then
+	if thp &amp;gt; 35 and envr==0 and cp &amp;lt; 3 then	
+		cast(gsi(mut), t)		
+	end	
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Opener</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if not IsMounted() and UnitExists(t) and not UnitIsDeadOrGhost(p) and not UnitIsDeadOrGhost(t) then
+	if (outcom or UnitInParty(p) or UnitInRaid(p)) and not ubid(p,sth) and canattack and check(sth) then 
+		cast(gsi(sth),nil) 
+	end
+	if sir(gsi(mut),t)==1 and (ubid(p,sth) or ubid(p,11327)) and UnitExists(t) and not pcasting then
+		if PQ_PPMode==&amp;quot;Only&amp;quot; then
+			if picked==true then
+				ClearTarget()
+			elseif picked==false and outcom then
+				if not udbid(t,sap,p) then
+					cast(gsi(sap),t)
+				else
+					RunMacroText(&amp;quot;/cast Pick Pocket&amp;quot;)
+					PQR_DelayRotation(0.5) 
+				end
+			end
+		end
+		if PQ_PPMode==&amp;quot;Auto&amp;quot; then
+			if picked==false and outcom and not ubid(p,11327) then
+				RunMacroText(&amp;quot;/cast Pick Pocket&amp;quot;)
+				PQR_DelayRotation(0.5)
+			else
+				cast(gsi(mut),t)
+			end
+		end
+		if PQ_PPMode==&amp;quot;Off&amp;quot; then
+			cast(gsi(mut),t)
+		end
+	end
+end
+if opener==0 and AOEMode==1 and not IsMounted() and UnitExists(t) and not UnitIsDeadOrGhost(p) and not UnitIsDeadOrGhost(t) then
+	if ubid(p,sth) and sir(gsi(mut),t)==1 then
+		cast(gsi(fok))
+	end
+	if not ubid(p,sth) and sir(gsi(mut),t)==1 then
+		StartAttack(t)
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Slice and Dice</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if sndr==0 and cp&amp;gt;=1 and pow&amp;gt;=25 then
+	cast(gsi(snd))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Rupture</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>--if rupr&amp;lt;=2 and pow&amp;gt;=25 and cp==5 and check(rup) then
+--	cast(gsi(rup))
+--end
+--if rupr&amp;lt;=2 and pow&amp;gt;=25 and cp &amp;gt; 0 and check(rup) then
+--	cast(gsi(rup))
+--end
+
+if rupr&amp;lt;=2 and pow&amp;gt;=25 and cp &amp;gt; 0 and check(rup) then
+   cast(gsi(rup))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Envenom</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if pow&amp;gt;=35 and AOEMode==0 then
+if envr &amp;gt; 0 and cp == 5 and antstack == 5 then
+ 	cast(gsi(env))
+elseif envr &amp;gt; 0 and cp == 5 and envr &amp;lt; 1 then
+	cast(gsi(env))
+elseif envr==0 and cp == 5
+ and ( ( thp &amp;gt;= 35 and pow &amp;gt;= 70 )
+ or ( thp &amp;lt; 35 and pow &amp;gt;= 70 )
+ or shb ~= nil ) then
+	cast(gsi(env))
+end
+end
+
+if pow&amp;gt;=35 and AOEMode~=0 then
+	if cp&amp;gt;=2 and sndr &amp;lt; 3 then
+		cast(gsi(env), nil)	
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Dispatch</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if (thp&amp;lt;=35 or ubid(p,bls)) and pow&amp;gt;=30 and check(dis) then
+	if cp==5 and antstack &amp;lt; 5 and ubid(p,env) and ubid(p,rup) then
+		cast(gsi(dis))
+	end
+	if cp &amp;lt; 5 then
+		cast(gsi(dis))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Vendetta</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if not ubid(p,sth) and check(ven) and sir(gsi(mut),t)==1 and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto) and ttd(t) &amp;gt; 30 then
+	cast(gsi(ven))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Shadow Blades</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if not ubid(p,sth) and cd(shb)==0 and sir(gsi(mut),t)==1 and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto) and ttd(t) &amp;gt; 15 then
+	cast(gsi(shb))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Vanish</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if (select(1,cd(van)) + select(2,cd(van)) - GetTime())&amp;gt;=60 and (select(1,cd(van)) + select(2,cd(van)) - GetTime()) &amp;lt;= 110 and cd(prp)==0 and ttd(t) &amp;gt; 30 then
+	cast(gsi(prp))
+end
+if not ubid(p,sth) and cd(van)==0 and sir(gsi(mut),t)==1 and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto) and ttd(t) &amp;gt; 30 then
+	cast(gsi(van))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Defensive</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and not ubid(p,sth) then
+	if php&amp;lt;=75 and check(cos) then
+		cast(gsi(cos))
+	end
+	if php&amp;lt;=50 and check(eva) then
+		cast(gsi(eva))
+	end
+	if php&amp;lt;=30 and cd(smb)==0 then
+		cast(gsi(smb))
+	end
+	if php &amp;lt; 30 and GetItemCount(5512,false,false) &amp;gt; 0 and ( select(2, GetItemCooldown(5512)) == 0 ) then
+    	UseItemByName(5512)
+    	return true
+	end
+	if php&amp;lt;=25 and pow&amp;gt;=30 and cp &amp;gt; 0 and not ubid(p,rec) then
+		cast(gsi(rec),t)
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Fan of Knives</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if AOEMode==1 and pow&amp;gt;=35 and sir(gsi(bli),t)==1 and cp &amp;lt; 3 and envr &amp;gt; 0 then
+	cast(gsi(fok))
+	RunMacroText(&amp;quot;/startattack&amp;quot;)
+end
+if AOEMode==2 and pow&amp;gt;=35 and sir(gsi(bli),t)==1 and rupr==0 and cp &amp;lt; 3 then
+	cast(gsi(fok))
+	RunMacroText(&amp;quot;/startattack&amp;quot;)
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Crimsom Tempest</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if cd(crm)==0 and pow&amp;gt;=35 and cp==5 then
+	cast(gsi(crm))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Tricks of the Trade</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if not ubid(p,tot) and cd(tot)==0 then
+	if UnitExists(&amp;quot;focus&amp;quot;) and CanHeal(&amp;quot;focus&amp;quot;) and not LineOfSight(&amp;quot;focus&amp;quot;) then
+		cast(gsi(tot), &amp;quot;focus&amp;quot;)
+	--else
+	--	if select(2,IsInInstance())~=&amp;quot;none&amp;quot; then
+	--		if PQR_CustomTarget ~= tmembers[1].Unit then
+	--			PQR_CustomTarget = tmembers[1].Unit
+	--			if PQR_CustomTarget == &amp;quot;&amp;quot; or PQR_CustomTarget == &amp;quot;player&amp;quot; then
+	--				return false
+	--			end
+	--		end
+	--		if UnitExists(PQR_CustomTarget) and UnitCanCooperate(p,PQR_CustomTarget) and (UnitInParty(PQR_CustomTarget) or UnitInRaid(PQR_CustomTarget)) and not pcasting and ttd(t) &amp;gt; 30 then
+	--			cast(gsi(tot),PQR_CustomTarget)
+	--		end
+	--	end		
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Trinkets/Prof/Racial</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and sir(gsi(mut),t)==1 and not ubid(p,sth) and ttd(t) &amp;gt; 15 then
+	if GetInventoryItemCooldown(p,10) == 0 and select(3,GetInventoryItemCooldown(p,10))==1 then
+		UseInventoryItem(10)
+	end
+	if GetInventoryItemCooldown(p,13) == 0 and select(3,GetInventoryItemCooldown(p,13))==1 then
+		UseInventoryItem(13)
+	end
+	if GetInventoryItemCooldown(p,14) == 0 and select(3,GetInventoryItemCooldown(p,14))==1 then
+		UseInventoryItem(14)
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Interrupts</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and check(kik) and Interruptable(t,kik) then
+	cast(gsi(kik),t) 
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Redirect</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>--if UnitExists(t) then
+--	if ctar==0 then
+--		ctar = UnitGUID(t)
+----		ccp = GetComboPoints(p, t)
+--	end
+--	if ftar==0 and UnitGUID(t) ~= ctar then
+--		ftar = UnitGUID(t)
+--		fcp = GetComboPoints(p, t)
+--	end
+--	if ftar ~= ctar and ccp==0 then
+--		ctar = ftar
+--		ccp = fcp
+--	end
+--	if ftar ~= ctar and ftar~=0 and ccp&amp;gt;=3 and fcp==0 then
+--		if check(red) then
+--			cast(gsi(red), nil)
+--			ctar = ftar
+--		end
+--	end
+--end
+
+if not redirect then 
+   redirect = CreateFrame(&amp;quot;Frame&amp;quot;)
+end
+local reframe = redirect
+reframe:RegisterEvent(&amp;quot;UNIT_COMBO_POINTS&amp;quot;)
+reframe:SetScript(&amp;quot;OnEvent&amp;quot;, function(self, event, ...)
+
+if event == &amp;quot;UNIT_COMBO_POINTS&amp;quot; then 
+       cps = GetComboPoints(&amp;quot;player&amp;quot;)    
+end
+end)
+if cps == nil then
+	cps = 0
+end
+if outcom then
+	csp = 0
+end
+local ComboPoints = GetComboPoints(&amp;quot;player&amp;quot;, &amp;quot;target&amp;quot;)
+if UnitExists(&amp;quot;Target&amp;quot;) and ComboPoints ~= cps and check(red) and cps~=0 then
+    cast(gsi(red),t)
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>MultiTargetHandler</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if mtar1==nil or not UnitAffectingCombat(&amp;quot;player&amp;quot;) then
+	mtar1 = 0
+	mrup1 = 0
+end
+if mtar2==nil or not UnitAffectingCombat(&amp;quot;player&amp;quot;) then
+	mtar2 = 0
+	mrup2 = 0
+end
+if mtar3==nil or not UnitAffectingCombat(&amp;quot;player&amp;quot;) then
+	mtar3 = 0
+	mrup3 = 0
+end
+if tswitch == nil or not UnitAffectingCombat(&amp;quot;player&amp;quot;) then
+	tswitch = 0
+end
+
+if UnitAffectingCombat(&amp;quot;player&amp;quot;) then
+	if not UnitExists(&amp;quot;target&amp;quot;) then
+		TargetNearestEnemy()
+	end
+	if UnitExists(&amp;quot;target&amp;quot;) then
+		if mtar1==0 then
+			if udbid(t,rup,p) then
+				if select(7, udbid(t,rup,p)) &amp;gt; 3 then
+					mrup1 = select(7, udbid(t,rup,p))
+					if (mrup1 - GetTime()) &amp;gt; 3 then
+						mtar1 = UnitGUID(&amp;quot;target&amp;quot;)
+						mtar2 = 1
+					end
+				end
+			end
+		elseif mtar1~=0 and (mrup1 - GetTime()) &amp;gt; 3 then
+			if UnitGUID(&amp;quot;target&amp;quot;)~=mtar1 and UnitGUID(&amp;quot;target&amp;quot;)~=mtar3 then
+				tswitch = 1
+			else
+				TargetNearestEnemy()
+			end
+		end
+		if mtar2==mtar1 then
+			mrup2 = 0
+			mtar2 = 1
+		end
+		if mtar2==1 then
+			if udbid(t,rup,p) then
+				if select(7, udbid(t,rup,p)) &amp;gt; 3 then
+					mrup2 = select(7, udbid(t,rup,p))
+					if (mrup2 - GetTime()) &amp;gt; 3 then
+						mtar2 = UnitGUID(&amp;quot;target&amp;quot;)
+						mtar3 = 2
+					end	
+				end
+			end
+		elseif mtar2~=1 and (mrup2 - GetTime()) &amp;gt; 3 then
+			if UnitGUID(&amp;quot;target&amp;quot;)~=mtar2 and UnitGUID(&amp;quot;target&amp;quot;)~=mtar1 then
+				tswitch = 2
+			else
+				TargetNearestEnemy()
+			end
+		end
+		if mtar3==mtar2 then
+			mrup3 = 0
+			mtar3 = 2
+		end
+		if mtar3==2 then
+			if udbid(t,rup,p) then
+				if select(7, udbid(t,rup,p)) &amp;gt; 3 then
+					mrup3 = select(7, udbid(t,rup,p))
+					if (mrup3 - GetTime()) &amp;gt; 3 then
+						mtar3 = UnitGUID(&amp;quot;target&amp;quot;)
+					end	
+				end
+			end
+		end 
+		if (mrup1 - GetTime()) &amp;lt; 3 then
+			mtar1 = 0
+			mrup1 = 0
+			tswitch = 0
+		end
+		if (mrup2 - GetTime()) &amp;lt; 3 then
+			mtar2 = 1
+			mrup2 = 0
+		end
+		if (mrup3 - GetTime()) &amp;lt; 3 then
+			mtar3 = 2
+			mrup3 = 0
+		end
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability></ROGUE>

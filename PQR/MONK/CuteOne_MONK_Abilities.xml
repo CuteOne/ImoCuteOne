@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="utf-8" ?><MONK><Ability><Name>Initial</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if PQR_RotationStarted == true then
+	PQR_RotationStarted = false
+	if PQR_LoadLua ~= nil then
+   		if PQR_LoadLua(&amp;quot;PQR_CuteOne.lua&amp;quot;) == false then 
+      		PQR_WriteToChat(&amp;quot;Put PQR_CuteOne.lua in the data folder.&amp;quot;, &amp;quot;Error&amp;quot;)
+      		PQR_StopRotation()
+       		return true
+		end
+	end
+  	rotchange = 0
+end
+
+if (select(2, UnitClass(&amp;quot;player&amp;quot;)) ~= &amp;quot;MONK&amp;quot;) then
+	print(&amp;quot;Error: Wrong Class&amp;quot;)
+	PQR_StopRotation()
+elseif (GetSpecialization() == nil and UnitLevel(&amp;quot;player&amp;quot;) &amp;gt;= 10) then
+	print(&amp;quot;Error: Wrong Spec - None selected!&amp;quot;)
+	PQR_StopRotation()
+end
+
+shcom()
+
+aggro = UnitThreatSituation(t)
+
+------Abilities------
+bok	=	100784	--Blackout Kick
+chw	=	115098	--Chi Wave
+cjl	=	117952	--Crackling Jade Lightning
+dhm	=	122278	--Dampen Harm
+dis	=	116095	--Disable
+dtx	=	115450	--Detox
+enb	=	115288	--Energizing Brew
+exh	=	115072	--Expel Harm
+fof	=	113656	--Fists of Fury
+fsk	=	101545	--Flying Serpent Kick
+ftb	=	115203	--Fortifying Brew
+grb	=	117368	--Grapple Weapon
+inx	=	123904	--Invoke Xuen
+jab	=	108557	--Jab
+loe	=	115921	--Legacy of the Emporor
+lsw	=	119381	--Leg Sweep
+lwt	=	116781	--Legacy of the White Tiger
+nmb	=	137562	--Nimble Brew
+par	=	115078	--Paralysis
+pro	=	115546	--Provoke
+res	=	115178	--Resuscitate
+rol	=	109132	--Roll
+rsk	=	107428	--Raising Sun Kick
+sck	=	101546	--Spinning Crane Kick
+sfb	=	115073	--Spinning Fire Blossom
+sft	=	103985	--Stance of the Fierce Tiger
+shs	=	116705	--Spear Hand Strike
+teb	=	116740	--Tigereye Brew
+tpm	=	100787	--Tiger Palm
+tod	=	115080	--Touch of Death
+tok	=	122470	--Touch of Karma
+znp	=	126892	--Zen Pilgramage
+zns	=	124081	--Zen Sphere
+
+------Buffs/Debuffs------
+chi	=	UnitPower(p,12)		--Tracking Chi Count
+mch	=	UnitPowerMax(p,12)	--Tracking Max Chi Count
+dth =	121125				--Tracking Touch of Death Availability
+tpw =	125359				--Tiger Power
+cbt	=	118864				--Combo Breaker: Tiger Palm
+cbk	=	116768				--Combo Breaker: Blackout Kick
+zsb	=	124081				--Zen Sphere Buff
+tes	=	125195				--Tigereye Brew Stacks
+dbl	=	116706				--Disable (root)
+		
+------Tracking------
+-- Tiger Power Remain
+if ubid(p,tpw) then
+	tpr = (select(7, ubid(p,tpw)) - GetTime())
+else
+	tpr = 0
+end
+-- Combo Breaker: Tiger Palm Remain
+if ubid(p,cbt) then
+	ctr	= (select(7, ubid(p,cbt)) - GetTime())
+else
+	ctr = 0
+end
+-- Zen Sphere Buff Remain
+if ubid(p,zsb) then
+	zsr = (select(7, ubid(p,zsb)) - GetTime())
+else
+	zsr = 0
+end
+-- Touch of Death Ability
+if death==nil or plvl &amp;lt; 22 then
+	death = false
+end
+if UnitExists(t) and plvl&amp;gt;=22 and cd(tod)==0 and not UnitIsPlayer(t) then
+	if not UnitIsDeadOrGhost(t) then
+		if (ubid(p,dth) or thealth &amp;lt; phmax) then
+			if GlyphCheck(123391) or chi&amp;gt;=3 then
+				death = true
+			else 
+				death = false
+			end
+		else
+			death = false				
+		end
+	else
+		death = false
+	end
+else
+	death = false
+end
+-- Tigereye Brew Count
+if select(4,ubid(p,tes)) == nil then
+	tec = 0
+else 
+	tec = select(4,ubid(p,tes))
+end
+-- Tigereye Brew Buff Remain
+if ubid(p,teb,&amp;quot;EXACT|PLAYER&amp;quot;) then
+	tbr = (select(7, ubid(p,teb,&amp;quot;EXACT|PLAYER&amp;quot;)) - GetTime())
+else
+	tbr = 0
+end
+-- Raising Sun Kick Debuff Remain
+if udbid(t,rsk,p) then
+	rsr = (select(7, udbid(t,rsk,p)) - GetTime())
+else
+	if plvl&amp;gt;=56 then
+		if cd(rsk)~=0 then
+			rsr = 999
+		else
+			rsr = 0
+		end
+	else
+		rsr = 999
+	end
+end
+-- Fists of Fury Haste
+ffh = (4 / (1 + UnitSpellHaste(p) / 100))
+
+-- CD Switch
+if PQ_CDMode==nil then
+	PQ_CDMode = &amp;quot;Boss&amp;quot;
+end
+if IsRightControlKeyDown() and not GetCurrentKeyBoardFocus() and GetTime() - PQ_CDTimer &amp;gt; 0.25 then
+	PQ_CDTimer = GetTime()
+	
+	if not PQ_CD then
+		PQ_CD = CD_BossOnly
+		PQ_CDMode = &amp;quot;Boss&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CCooldown Mode: |cff79BAECBoss Only|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	elseif PQ_CD == CD_BossOnly then
+		PQ_CD = CD_Auto
+		PQ_CDMode = &amp;quot;On&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CCooldown Mode: |cff006400On|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	else
+		PQ_CD = false
+		PQ_CDMode = &amp;quot;Off&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CCooldown Mode: |cffDC143COff|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	end
+end
+
+-- AoE/Single Switch
+if AOEMode == nil then
+	AOEMode = 0
+end 
+if PQ_Rot == nil then
+	PQ_Rot = &amp;quot;Single&amp;quot;
+end
+
+if IsRightShiftKeyDown() and not GetCurrentKeyBoardFocus() and GetTime() - PQ_AOETimer &amp;gt; 0.25 then
+	PQ_AOETimer = GetTime()
+	
+	if PQ_AOE then
+		PQ_AOE = false
+		AOEMode = 0
+		PQ_Rot = &amp;quot;Single&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CAOE Mode: |cffDC143CSingle|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	elseif AOEMode==0 then
+		PQ_AOE = true
+		AOEMode = 1
+		PQ_Rot = &amp;quot;Multi&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CAOE Mode: |cff006400Multi|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	end
+end
+PQR_Event(&amp;quot;PQR_Text&amp;quot;,&amp;apos;CD-Mode: &amp;apos;..PQ_CDMode..&amp;apos; --- &amp;apos;..&amp;apos;AOE-Mode: &amp;apos;..PQ_Rot)
+
+GroupInfo()
+timecheck()
+--Dummy 5min DPS Test
+--if UnitExists(&amp;quot;target&amp;quot;) then
+--	if cTime &amp;gt;= 300 and dummy() then  
+--		StopAttack()
+--		ClearTarget()
+--		print(&amp;quot;5 Minute Dummy Test Concluded - Profile Stopped&amp;quot;)
+--		PQR_StopRotation()
+--	end
+--end
+if incom and ((cTime &amp;lt; 300 and dummy()) or not dummy()) then
+	if not IsMounted() and (not UnitExists(&amp;quot;target&amp;quot;) or UnitIsDead(&amp;quot;target&amp;quot;)) then
+		if incom and AOEMode==1 then
+			TargetNearestEnemy()
+		end
+		if sir(gsi(108557),t)==1 then
+			RunMacroText(&amp;quot;/startattack&amp;quot;)
+		end
+	end
+end
+if UnitExists(&amp;quot;target&amp;quot;) and not UnitIsDead(&amp;quot;target&amp;quot;) and sir(gsi(108557),t)==1 then
+	RunMacroText(&amp;quot;/startattack&amp;quot;)
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Jab</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if check(jab) and pow&amp;gt;=40 and death==false then
+	if AOEMode==0 then
+		if plvl &amp;lt; 3 then
+			cast(gsi(jab))
+		end
+		if chi &amp;lt;= 2 and (php&amp;gt;=80 or cd(exh)~=0) then
+			cast(gsi(jab))
+		end
+	end
+	if AOEMode==1 then
+		if chi &amp;lt; 2 and (rsr&amp;lt;=1 and plvl &amp;gt; 56) then
+			cast(gsi(jab))
+		end
+		if chi &amp;lt; 1 and tpr&amp;lt;=1 then
+			cast(gsi(jab))
+		end
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Expel Harm</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=26 then
+if cd(exh)==0 and pow&amp;gt;=40 and chi&amp;lt;=3 
+and (php &amp;lt; 80 or (outcom and not IsMounted()and not pchannel and not pcasting and not UnitIsDeadOrGhost(p) and not ubid(p,104934) and not ubid(p,104269))) 
+and death==false then
+	cast(gsi(exh))
+end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Tiger Palm</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=3 then
+	if check(tpm) and death==false then
+		if plvl &amp;lt; 7 then
+			cast(gsi(tpm))
+		end
+		if chi&amp;gt;=1 and tpr &amp;lt;= 3 then
+			cast(gsi(tpm))
+		end
+		if chi&amp;gt;=1 and tpr==0 and rsr &amp;gt; 1 and tmp &amp;gt; 1 then
+			cast(gsi(tpm))
+		end
+		if (ctr &amp;gt; 0 and tmp&amp;gt;=2) or (ctr&amp;lt;=2 and ctr &amp;gt; 0) then
+			cast(gsi(tpm))
+		end 
+		--if ctr &amp;gt; 0 and (ctr &amp;lt; 2 or tmp &amp;lt; 2) then
+		--	cast(gsi(tpm))
+		--end
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Blackout Kick</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=7 then
+	if check(bok) and (chi&amp;gt;=2 or ubid(p,cbk)) and death==false and AOEMode==0 then
+		if plvl&amp;gt;=56 then
+		--	if rsr &amp;gt; 1 or (chi &amp;gt;= 3 and tmp &amp;lt; 2) or ubid(p,cbk) or chi==mch then
+		--		cast(gsi(bok))
+		--	end
+			if ubid(p,cbk) then
+				cast(gsi(bok))
+			end
+			if (pow+(repow*cd(rsk)))&amp;gt;=40 then
+				cast(gsi(bok))
+			end 	
+		end
+		if plvl &amp;lt; 56 then
+			cast(gsi(bok))
+		end
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Fists of Fury</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=10 then
+	if incom 
+		and cd(fof)==0 
+		and sir(gsi(jab),t)==1 
+		--and pow&amp;lt;=30 
+		and death==false 
+		and chi&amp;gt;=3 
+		and tpr &amp;gt; 4 
+		and tmp &amp;gt; 4 --ffh 
+		and not ubid(p,enb)
+		and not PQR_IsMoving(0.5) 
+	then
+		cast(gsi(fof))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Touch of Death</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=22 then
+	if plvl&amp;gt;=24 and cd(ftb)==0 and cd(tod)==0 and sir(gsi(tod),t)==1 and thp &amp;gt; phmax and thp &amp;lt;= (phmax * 0.2 + phmax) then
+		cast(gsi(ftb))
+	end
+	if death==true and cd(tod)==0 and sir(gsi(tod),t)==1 then
+		cast(gsi(tod))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Detox</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=20 then
+if ValidDispel(p) and cd(dtx)==0 and pow&amp;gt;=20 then
+	cast(gsi(dtx),p)
+end
+if ValidDispel(&amp;quot;mouseover&amp;quot;) and cd(dtx)==0 and pow&amp;gt;=20 then
+	cast(gsi(dtx),&amp;quot;mouseover&amp;quot;)
+end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Defensive</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if not IsMounted() and not UnitIsDeadOrGhost(p) then
+-- Zen Spheres
+if plvl&amp;gt;=30 and select(5,GetTalentInfo(5))==true then
+	if zsr&amp;lt;=1 and cd(zns)==0 and members[1].HP &amp;lt; php and not udbid(members[1].Unit, 137341, nil) and not LineOfSight(members[1].Unit) then
+		PQR_CustomTarget = members[1].Unit
+		cast(gsi(zns),PQR_CustomTarget)
+	else
+		if zsr&amp;lt;=1 and cd(zns)==0 and php&amp;lt;=75 then
+			cast(gsi(zns),p)
+		end
+	end
+end
+-- Dampen Harm
+if plvl&amp;gt;=75 and TalentCheck(122278) then
+	if php&amp;lt;=75 and cd(dhm)==0 then
+		cast(gsi(dhm),p)
+	end
+end
+-- Touch of Karma
+if plvl&amp;gt;=22 then
+	if php&amp;lt;=50 and cd(tok)==0 and UnitExists(t) then
+		cast(gsi(tok),t)
+	end
+end
+-- Fortifying Brew
+if plvl&amp;gt;=24 then
+	if php&amp;lt;=40 and cd(ftb)==0 then
+		cast(gsi(ftb))
+	end
+end
+
+-- Healthstone
+if php &amp;lt; 30 and GetItemCount(5512,false,false) &amp;gt; 0 and ( select(2, GetItemCooldown(5512)) == 0 ) then
+    UseItemByName(5512)
+end
+
+-- Health Potion
+if php &amp;lt; 25 and CanHealPot() then
+	UseItemByName(drinkme)
+end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Pause</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if IsLeftAltKeyDown() 
+or IsMounted()
+or SpellIsTargeting()
+or not UnitExists(&amp;quot;Target&amp;quot;)
+or UnitBuffID(&amp;quot;Player&amp;quot;,80169)
+or UnitBuffID(&amp;quot;Player&amp;quot;,87959)
+or UnitChannelInfo(&amp;quot;Player&amp;quot;) 
+or UnitIsDeadOrGhost(&amp;quot;Player&amp;quot;) 
+or UnitIsDeadOrGhost(&amp;quot;Target&amp;quot;)
+or UnitBuffID(&amp;quot;target&amp;quot;,117961)
+or not UnitAffectingCombat(&amp;quot;Player&amp;quot;)
+then return true end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Legacy of the Emperor</Name><Default>false</Default><SpellID>115921</SpellID><Actions></Actions><Lua>if not IsMounted() and outcom and plvl &amp;gt;= 22 and not ubid(p,104934) and not ubid(p,104269) and not UnitIsDeadOrGhost(p) and not pcasting and not pchannel then
+	for i=1,#members do 
+	    if not HaveBuff(members[i].Unit,{115921,20217,1126,90363}) and (#members==select(5,GetInstanceInfo()) or select(2,IsInInstance())==&amp;quot;none&amp;quot;)
+	    then return true end
+	end
+end</Lua><RecastDelay>1000</RecastDelay><Target>Player</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Interrupts</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=32 then
+	if incom and check(shs) and Interruptable(t,shs) then
+		cast(gsi(shs),t) 
+	end
+end
+if plvl&amp;gt;=60 then
+	if TalentCheck(119381) and incom and cd(lsw)==0 and sir(gsi(jab),t)==1 and (Interruptable(t,lsw) or (tcasting or tchannel)) then
+		cast(gsi(lsw),t)
+	end
+end
+if plvl&amp;gt;=44 then
+	if incom and check(par) and (cd(shs)~=0 or sir(gsi(jab),t)~=1) and (Interruptable(t,par) or ((tcasting or tchannel) and not SpecialUnit())) then
+		cast(gsi(par),t)
+	end
+	if incom and check(par) and Interruptable(&amp;quot;mouseover&amp;quot;,par) and not SpecialUnit() then
+		cast(gsi(par),&amp;quot;mouseover&amp;quot;)
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Provoke</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=14 and not IsMounted() then
+	if outcom and select(2,IsInInstance())==&amp;quot;none&amp;quot; and not LineOfSight(t) and not UnitInParty(p) and not UnitInRaid(p) then
+		if check(pro) then
+			cast(gsi(pro))
+		end
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Resuscitate</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl &amp;gt;= 18 then
+if UnitExists(&amp;quot;mouseover&amp;quot;) 
+	and not UnitAffectingCombat(p)
+	and UnitIsDeadOrGhost(&amp;quot;mouseover&amp;quot;) 
+	and UnitCanCooperate(p, &amp;quot;mouseover&amp;quot;)    
+	and sir(gsi(res),&amp;quot;mouseover&amp;quot;) == 1
+	and cd(res) == 0 
+	and not PQR_IsOutOfSight(&amp;quot;mouseover&amp;quot;)
+	and not UnitCastingInfo(p) 
+	and UnitChannelInfo(p) == nil 
+then
+	cast(gsi(res),&amp;quot;mouseover&amp;quot;)	
+end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Energizing Brew</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=36 then
+	if incom and check(enb) and tmp &amp;gt; 5 and death==false then
+		cast(gsi(enb))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Chi Wave</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=30 then
+if check(chw) and sir(gsi(jab),t)==1 and death==false then
+	if plvl&amp;gt;=56 then
+		if tmp &amp;gt; 2 then--rsr&amp;gt;=1 then
+			cast(gsi(chw))
+		end
+	else
+		cast(gsi(chw))
+	end
+end
+if incom and sir(gsi(jab),t)==0 and sir(gsi(chw),t)==1 then
+	cast(gsi(chw))
+end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Nimble Brew</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=30 then
+	if LossOfControl(nmb)==true and cd(nmb)==0 then
+		cast(gsi(nmb))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Spinning Crane Kick</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=46 then
+	if AOEMode==1 and pow&amp;gt;=40 and sir(gsi(jab),t)==1 and tpr &amp;gt; 1 and (rsr &amp;gt; 1 or plvl &amp;lt; 56) and not death then
+		cast(gsi(sck))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Spinning Fire Blossom</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=48 and AOEMode==0 and incom then
+	if cd(sfb)==0 and sir(gsi(jab),t)==0 and sir(gsi(cjl),t)==1 and chi&amp;gt;=1 and not pchannel then
+		cast(gsi(sfb),t)
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Raising Sun Kick</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=56 then
+	if cd(rsk)==0 and sir(gsi(rsk),t)==1 and chi&amp;gt;=2 and tpr &amp;gt; 1 and death==false then
+		cast(gsi(rsk))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Tigereye Brew</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=56 then
+	if incom and death==false then
+		if tbr &amp;lt; 1 and cd(rsk)==0 and chi&amp;gt;=2 and rsr &amp;gt; 0 and tpr &amp;gt; 0 and tec &amp;gt; 0 then
+			cast(gsi(teb),nil)
+		end 
+		if tbr &amp;lt; 1 and tec &amp;gt;= 10 then
+			cast(gsi(teb),nil)
+		end
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Disable</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if PQR_CheckUIError(SPELL_FAILED_IMMUNE)==true then
+	if UnitExists(t) then
+		immtar = UnitGUID(t)
+		immune = true
+	end
+end
+if outcom or UnitExists(t) then
+	if outcom or UnitGUID(t)~=immtar then
+		immune = false
+	end
+end
+
+if thp&amp;lt;=25 and pow&amp;gt;=15 and sir(gsi(jab),t)==1 and not udbid(t,dbl,p) and immune and not SpecialUnit() then
+	cast(gsi(dis))
+end
+if thp&amp;lt;=25 and pow&amp;gt;=15 and sir(gsi(jab),t)==1 and not udbid(t,dbl,p) and immune and not SpecialUnit() then
+	cast(gsi(dis))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Trinkets</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if sir(gsi(jab),t)==1 then
+if incom and GetInventoryItemCooldown(p,13) == 0  then
+	UseInventoryItem(13)
+end
+if incom and GetInventoryItemCooldown(p,14) == 0  then
+	UseInventoryItem(14)
+end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Legacy of the White Tiger</Name><Default>false</Default><SpellID>116781</SpellID><Actions></Actions><Lua>if not IsMounted() and outcom and plvl &amp;gt;= 81 and not ubid(p,104934) and not ubid(p,104269)  and not UnitIsDeadOrGhost(p) and not pcasting and not pchannel then
+	for i=1,#members do 
+	    if not HaveBuff(members[i].Unit,{116781,17007,1459,61316,24604,90309,126373,126309}) and (#members==select(5,GetInstanceInfo()) or select(2,IsInInstance())==&amp;quot;none&amp;quot;)
+	    then return true end
+	end
+end</Lua><RecastDelay>1000</RecastDelay><Target>Player</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Grapple Weapon</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl &amp;gt;= 68 then
+	if PQR_CheckUIError(SPELL_FAILED_TARGET_NO_RANGED_WEAPONS)==true then
+		if UnitExists(t) then
+			grabtar = UnitGUID(t)
+			grapple = false
+		end
+	end
+	if outcom or UnitExists(t) then
+		if outcom or UnitGUID(t)~=grabtar then
+			grapple = true
+		end
+	end
+
+	if incom and cd(grb)==0 and sir(gsi(jab),t)==1 and grapple then
+		cast(gsi(grb))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Invoke Xuen</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom 
+	and plvl&amp;gt;=90
+	and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto)
+	and cd(inx)==0  
+	and sir(gsi(jab),t)==1 
+--	and ttd(t)&amp;gt;=18
+then 
+	cast(gsi(inx)) 
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Flying Serpent Kick</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom and cd(gsi(fsk))==0 and sir(gsi(jab),t)==1 and pow &amp;lt; 40 and chi &amp;lt; 2 and tpr &amp;gt; 2 and rsr &amp;gt; 2 then
+	cast(gsi(fsk))
+	cast(gsi(fsk))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Crackling Jade Lightning</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=54 and AOEMode==0 and incom then
+	if chi &amp;lt; 1 and sir(gsi(jab),t)==0 and sir(gsi(cjl),t)==1 and not PQR_IsMoving(0.5) and pow&amp;gt;=40 then
+		cast(gsi(cjl))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability></MONK>

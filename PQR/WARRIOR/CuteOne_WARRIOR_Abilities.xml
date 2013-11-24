@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="utf-8" ?><WARRIOR><Ability><Name>Execute</Name><Default>false</Default><SpellID>5308</SpellID><Actions></Actions><Lua>if incom 
+	and AOEMode==0
+	and thp &amp;lt;= 20 
+	and check(ex) 
+	and (not ubid(p,sd)) or (not ubid(p,tfbb)) or pow &amp;gt; 70
+then
+	cast(gsi(ex))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Berserker Rage</Name><Default>false</Default><SpellID>18499</SpellID><Actions></Actions><Lua>if incom 
+	and check(br) 
+	and err &amp;lt; 0.5 
+then 
+	cast(gsi(br))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Colossus Smash</Name><Default>false</Default><SpellID>86346</SpellID><Actions></Actions><Lua>if incom 
+	and check(cs)
+	and csr&amp;lt;=1.0 
+then
+	cast(gsi(cs))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Heroic Strike</Name><Default>false</Default><SpellID>78</SpellID><Actions></Actions><Lua>t16count = 0
+if incom
+	and AOEMode == 0 
+	and check(hs)
+	and ((GlyphCheck(4339) and pow &amp;gt; 115) or pow &amp;gt; 85) or (csr &amp;gt; 0 and pow &amp;gt; 40 and t16count &amp;gt; 2)
+then 
+	cast(gsi(hs))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Battle Shout</Name><Default>false</Default><SpellID>6673</SpellID><Actions></Actions><Lua>if incom 
+	and check(bs) 
+then
+	if AOEMode==0 then
+		cast(gsi(bs),nil)
+	end
+	if AOEMode==1 and pow &amp;lt; 70 then
+		cast(gsi(bs),nil)
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Whirlwind</Name><Default>false</Default><SpellID>1680</SpellID><Actions></Actions><Lua>if incom 
+	and AOEMode==1
+	and check(ww)
+	and pow&amp;gt;=30 
+	and sir(gsi(ms),t)==1 
+then
+	cast(gsi(ww))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Cleave</Name><Default>false</Default><SpellID>845</SpellID><Actions></Actions><Lua>if incom 
+	and check(clv)
+	and sir(gsi(ms),t)==1 
+	and pow &amp;gt; 110  
+then
+	cast(gsi(clv))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Mortal Strike</Name><Default>false</Default><SpellID>12294</SpellID><Actions></Actions><Lua>if incom 
+	and check(ms) 
+then
+	cast(gsi(ms))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Overpower</Name><Default>false</Default><SpellID>7384</SpellID><Actions></Actions><Lua>if incom 
+	and AOEMode==0
+	and check(op) 
+	and pow&amp;gt;=10 
+	and thp&amp;gt;=20 or ubid(p,sd)
+then
+	cast(gsi(op))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Slam</Name><Default>false</Default><SpellID>1464</SpellID><Actions>/cast Lifeblood(Rank 8)</Actions><Lua>if incom 
+	and check(sl) 
+	and pow&amp;gt;=25
+	--and (pow&amp;gt;=(powmax-30) or pow&amp;gt;=40) 
+then
+	if AOEMode==0 and (csr &amp;gt; 0 and tfbc &amp;lt; 3) and thp&amp;gt;=20 then
+		cast(gsi(sl))
+	end
+	if AOEMode==1 and (csr &amp;gt; 0 or ubid(p,sw)) then
+		cast(gsi(sl))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Thunderclap</Name><Default>false</Default><SpellID>6343</SpellID><Actions></Actions><Lua>if incom 
+	and AOEMode~=0 
+	and check(tc)
+	and pow&amp;gt;=20 
+	and wbr&amp;lt;=15 
+	and sir(gsi(ms),t)==1 
+then
+	cast(gsi(tc))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Sweeping Strikes</Name><Default>false</Default><SpellID>12328</SpellID><Actions></Actions><Lua>if incom
+	and AOEMode==1 
+	and pow&amp;gt;=30 
+	and check(sw) 
+	and sir(gsi(ms),t)==1 
+then
+	cast(gsi(sw))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Initial</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if PQR_RotationStarted == true then
+  PQR_RotationStarted = false
+  if PQR_LoadLua ~= nil
+  then
+   		if PQR_LoadLua(&amp;quot;PQR_CuteOne.lua&amp;quot;) == false
+   		then 
+      			PQR_WriteToChat(&amp;quot;Put PQR_CuteOne.lua in the data folder.&amp;quot;, &amp;quot;Error&amp;quot;)
+      			PQR_StopRotation()
+       			return true
+  		end
+  end
+end
+
+shcom()
+timecheck()
+--Dummy 5min DPS Test
+if UnitExists(&amp;quot;target&amp;quot;) then
+if cTime &amp;gt;= 300 and dummy() then  
+	StopAttack()
+	ClearTarget()
+	print(&amp;quot;5 Minute Dummy Test Concluded - Profile Stopped&amp;quot;)
+	--PQR_StopRotation()
+end
+end
+
+------ABILITIES-------
+av		=	107574	--Avatar
+bs		=	6673 	--Battle Shout
+btls	= 	2457 	--Battle Stance
+br		= 	18499 	--Berserker Rage
+bers	=	2458 	--Berserker Stance
+bb		=	12292 	--Bloodbath
+bls		=	46924	--Bladestorm
+chrg	=	100 	--Charge
+clv		=	845 	--Cleave
+cs		= 	86346 	--Colossus Smash
+cmds	= 	469 	--Commanding Shout
+dc		=	85730 	--Deadly Calm
+defs 	=	71		--Defensive Stance
+dm		=	114203	--Demoralizing Banner
+dbts 	= 	118038	--Die by the Sword
+darm	= 	676 	--Disarm
+ds 		= 	102060	--Disrupting Shout
+dr		=	118000	--Dragon Roar
+er		=	55694	--Enraged Regeneration
+ex		=	5308	--Execute
+ham		=	1715	--Hamstring
+hl		=	6544	--Heroic Leap
+hs		=	78		--Heroic Strike
+ht		=	57755	--Heroic Throw
+iv		=	3411	--Intervene
+is		=	5246	--Intimidating Shout
+imp		=	103840	--Impending Victory
+mb		=	114192	--Mocking Banner
+msr		=	114028	--Mass Spell Reflection
+ms 		= 	12294 	--Mortal Strike
+op		=	7384	--Overpower
+pm		=	6552	--Pummel
+rc		=	97462	--Rallying Cry
+rk		=	1719	--Recklessness
+st		=	64382	--Shattering Throw
+sb		=	114207	--Skull Banner
+sbt		=	107570	--Storm Bolt
+shk		=	46968	--Shockwave
+shw		=	871		--Shield Wall 
+sl		=	1464	--Slam
+sr		=	23920	--Spell Reflection
+sa		=	7386	--Sunder Armor
+sw		=	12328	--Sweeping Strikes
+tnt		=	355		--Taunt
+tc		=	6343	--Thunder Clap
+vr		=	34428	--Victory Rush
+ww		=	1680	--Whirlwind
+
+------Racials------
+blf		=	20572	--Blood Fury (Orc)
+
+------Passives/Buffs/Debuffs------
+dw		=	115768 	--Deep Wounds
+erg		=	13046	--Enrage
+sd		=	29725	--Sudden Death
+tfb		=	56638	--Taste for Blood
+tfbb	=	60503	--Taste for Blood Buff
+wb		=	115798	--Weakend Blows
+
+-----Tracking------
+stance	=	GetShapeshiftForm()
+if udbid(t,wb,p) then
+	wbr = (select(7, udbid(t,wb,p)) - GetTime())
+else
+	wbr = 0
+end
+if smashed==nil then
+	smashed = 0
+end
+if udbid(t,cs,p) then
+	smashed = 1
+	csr = (select(7, udbid(t,cs,p)) - GetTime())
+else
+	smashed = 0
+	csr = 0
+end
+if ubid(p,erg) then
+	err = (select(7, ubid(p,erg)) - GetTime())
+else
+	err = 0
+end
+if select(4,ubid(p,tfbb)) == nil then
+	tfbc = 0
+else 
+	tfbc = select(4,ubid(p,tfbb))
+end
+if GlyphCheck(58357)==true then
+	gag = true
+else
+	gag = false
+end
+if gcd==nil then
+	gcd = 0
+end
+gcdcheck = GetTime() &amp;gt; 0
+
+-- CD Switch
+if PQ_CDMode==nil then
+	PQ_CDMode = &amp;quot;Boss&amp;quot;
+end
+if IsRightControlKeyDown() and not GetCurrentKeyBoardFocus() and GetTime() - PQ_CDTimer &amp;gt; 1 then
+	PQ_CDTimer = GetTime()
+	
+	if not PQ_CD then
+		PQ_CD = CD_BossOnly
+		PQ_CDMode = &amp;quot;Boss&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CCooldown Mode: |cff79BAECBoss Only|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	elseif PQ_CD == CD_BossOnly then
+		PQ_CD = CD_Auto
+		PQ_CDMode = &amp;quot;On&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CCooldown Mode: |cff006400On|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	else
+		PQ_CD = false
+		PQ_CDMode = &amp;quot;Off&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CCooldown Mode: |cffDC143COff|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	end
+end
+
+-- AoE/Single Switch
+if AOEMode == nil then
+	AOEMode = 0
+end 
+if PQ_Rot == nil then
+	PQ_Rot = &amp;quot;Single&amp;quot;
+end
+
+if IsRightShiftKeyDown() and not GetCurrentKeyBoardFocus() and GetTime() - PQ_AOETimer &amp;gt; 0.25 then 
+	PQ_AOETimer = GetTime()
+	
+	if PQ_AOE then
+		PQ_AOE = false
+		AOEMode = 0
+		PQ_Rot = &amp;quot;Single&amp;quot;
+	--	PQR_SwapRotation(&amp;quot;Arms Single (CuteOne)&amp;quot;)
+		PQR_WriteToChat(&amp;quot;|cff347C2CAOE Mode: |cffDC143CSingle|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	elseif AOEMode==0 then
+	--	PQ_AOE = false
+		AOEMode = 1
+	--	PQ_Rot = &amp;quot;Hybrid&amp;quot;
+	--	PQR_WriteToChat(&amp;quot;|cff347C2CAOE Mode: |cff79BAECHybrid|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	--elseif AOEMode==1 then
+		PQ_AOE = true
+	--	AOEMode = 2
+		PQ_Rot = &amp;quot;Multi&amp;quot;
+		PQR_WriteToChat(&amp;quot;|cff347C2CAOE Mode: |cff006400Multi|cffffffff&amp;quot;, &amp;quot;Notice&amp;quot;)
+	--	PQR_SwapRotation(&amp;quot;Arms AOE (CuteOne)&amp;quot;)
+	end
+end
+PQR_Event(&amp;quot;PQR_Text&amp;quot;,&amp;apos;CD-Mode: &amp;apos;..PQ_CDMode..&amp;apos; --- &amp;apos;..&amp;apos;AOE-Mode: &amp;apos;..PQ_Rot)
+
+ttd(&amp;quot;target&amp;quot;)
+
+--if plvl &amp;lt; 10 then
+--	if plvl &amp;gt;=3 and hastar and cd(chrg)==0 and sir(gsi(chrg),t)==1 then
+--		cast(gsi(chrg))
+--	end
+--	if pow&amp;gt;=30 and hastar then
+--		cast(gsi(hs))
+--	end
+--end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Heroic Throw</Name><Default>false</Default><SpellID>57755</SpellID><Actions></Actions><Lua>if plvl &amp;gt; 10 then
+	if incom
+		and AOEMode==0 
+		and check(ht)  
+	then
+		cast(gsi(ht))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Charge</Name><Default>false</Default><SpellID>100</SpellID><Actions></Actions><Lua>if hastar 
+	and check(chrg)
+	and sir(gsi(ms),t)~=1
+	and IsLeftShiftKeyDown() 
+	and GetCurrentKeyBoardFocus()==nil 
+then
+	cast(gsi(chrg))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Interrupts</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>--if check(pm) and Interruptable(t,pm) then
+--	cast(gsi(pm),t)
+--elseif check(ds) and cd(pm)~=0 and Interruptable(t,ds) then
+--   cast(gsi(ds),t) 
+--end
+--if incom and check(sh) then
+--	cast(gsi(sh))
+--end
+
+local castingTarget = nil
+local custTars	= {&amp;quot;target&amp;quot;,&amp;quot;focus&amp;quot;}
+for i=1, #custTars do
+	if ( select(9,UnitCastingInfo(custTars[i]))==false 
+		or select(8,UnitChannelInfo(custTars[i]))==false )
+	then
+		castingTarget = custTars[i]
+	end
+end
+
+if castingTarget ~= nil
+	and ubid(p,sr) == nil
+then
+	local castName = UnitCastingInfo(castingTarget)
+	local channelName = UnitChannelInfo(castingTarget)
+	local castName = channelName
+--Pum--
+	if select(2,cd(pm)) == 0
+		and sir(gsi(pm),castingTarget) == 1
+		and ( PQR_IsOnInterruptList(castName) ~= nil or PQR_IsInterruptAll() ~= nil )
+	then
+		cast(gsi(pm),castingTarget)
+		PQR_DelayRotation(.5)
+	end
+--DS--
+	if ( select(2,cd(pm)) ~= 0 or sir(gsi(pm),castingTarget) == 0)
+		and select(2,cd(ds)) == 0
+		and CheckInteractDistance(castingTarget,3) ~= nil
+		and ( PQR_IsOnInterruptList(castName) ~= nil or PQR_IsInterruptAll() ~= nil )
+	then
+		cast(gsi(ds))
+		PQR_DelayRotation(.5)
+	end
+--HT--
+	if gag == true
+		and ( select(2,cd(pm)) ~= 0	or sir(gsi(pm),castingTarget) == 0)
+		and ( select(2,cd(ds)) ~= 0	or CheckInteractDistance(castingTarget,3) == nil)
+		and select(2,cd(ht)) == 0
+		and sir(gsi(ht),castingTarget) == 1
+		and ( PQR_IsOnInterruptList(castName) ~= nil or PQR_IsInterruptAll() ~= nil )
+	then
+		cast(gsi(ht),castingTarget)
+	end
+--SB--
+	if ( select(2,cd(pm)) ~= 0 or sir(gsi(pm),castingTarget) == 0)
+		and ( select(2,cd(ds)) ~= 0	or CheckInteractDistance(castingTarget,3) == nil)
+		and select(2,cd(ht)) ~= 0
+		and select(2,cd(sbt)) == 0
+		and sir(gsi(ht),castingTarget) == 1
+		and ( PQR_IsOnInterruptList(castName) ~= nil or PQR_IsInterruptAll() ~= nil )
+	then
+		cast(gsi(sbt),castingTarget)
+	end
+--SR--
+	if ( select(2,cd(pm)) ~= 0 or sir(gsi(pm),castingTarget) == 0)
+		and ( select(2,cd(ds)) ~= 0	or CheckInteractDistance(castingTarget,3) == nil)
+		and select(2,cd(ht)) ~= 0
+		and select(2,cd(sbt)) ~= 0
+		and select(2,cd(sr)) == 0
+		--and sir(gsi(pm),castingTarget) == 1
+		and ( PQR_IsOnInterruptList(castName) ~= nil or PQR_IsInterruptAll() ~= nil )
+	then
+		cast(gsi(sr),castingTarget)
+	end				
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Recklessness</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom 
+	and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto) 
+	and check(rk)
+	and sir(gsi(ms),t)==1
+	--and (((ubid(p,bb) or (csr&amp;gt;=5 or cd(cs)&amp;lt;=2)) and (thp&amp;lt;=20 or ttd(t)&amp;gt;=186)) or ttd(t)&amp;lt;=13) 
+	--and (ttd(t)&amp;lt;=18 or ((ttd(t)&amp;gt;=186 or (thp &amp;lt; 20 and (csr&amp;gt;=5 or csr&amp;lt;=1.5))) and ((not TalentCheck(bb)) or cd(bb)==0)))
+	and ((not TalentCheck(bb) and ((cd(cs) &amp;lt; 2 or csr&amp;gt;=5) and (ttd(t) &amp;gt; 192 or thp &amp;lt; 20))) or (ubid(p,bb) and (ttd(t) &amp;gt; 192 or thp &amp;lt; 20)) or ttd(t)&amp;lt;=12)
+then
+	cast(gsi(rk))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Skull Banner</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom 
+	and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto) 
+	and check(sb) 
+	and sir(gsi(ms),t)==1 
+	and (not ubid(p,sb)) and (((cd(cs) &amp;lt; 2 or csr&amp;gt;=5) and ttd(t) &amp;gt; 192) or ubid(p,rk)) 
+then
+	cast(gsi(sb))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Tier 6</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=90 
+	and incom
+	and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto)	
+then
+	-- Avatar
+	if check(av)
+		and sir(gsi(ms),t)==1
+		and (ubid(p,rk) or ttd(t)&amp;lt;=25) 
+	then
+		cast(gsi(av))
+	end
+	-- Bloodbath
+	if check(bb) 
+		and sir(gsi(ms),t)==1 
+		and (csr &amp;gt; 0 or cd(cs) &amp;lt; 4)
+		--and (ttd(t)&amp;lt;=18 or ubid(p,rk) or ttd(t)&amp;gt;=75)
+		--and (((csr&amp;gt;=5 or cd(cs)&amp;lt;=2) and (thp&amp;lt;=20 or ttd(t)&amp;gt;=69)) or ttd(t)&amp;lt;=19)
+	then
+		cast(gsi(bb))
+	end
+	-- Storm Bolt
+	if check(sbt) 
+		and csr &amp;gt; 0
+	then
+		cast(gsi(sbt))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Pause</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if IsLeftAltKeyDown() 
+or IsMounted()
+or SpellIsTargeting()
+or not UnitExists(&amp;quot;Target&amp;quot;)
+or UnitBuffID(&amp;quot;Player&amp;quot;,80169)
+or UnitBuffID(&amp;quot;Player&amp;quot;,87959)
+or UnitChannelInfo(&amp;quot;Player&amp;quot;) 
+or UnitIsDeadOrGhost(&amp;quot;Player&amp;quot;) 
+or UnitIsDeadOrGhost(&amp;quot;Target&amp;quot;)
+or not UnitAffectingCombat(&amp;quot;Player&amp;quot;)
+--or plvl &amp;lt; 10
+then return true end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Defensive</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if php&amp;lt;=80 and check(vr) then
+	cast(gsi(vr))
+end
+if php&amp;lt;=80 and check(imp) then
+	cast(gsi(imp))
+end
+if php&amp;lt;=50 and ubid(p,erg) and check(er) then
+	cast(gsi(er))
+end
+if php &amp;lt;= 30 and sir(gsi(ms),t)~=1 then
+	if stance ~= 71 then
+		cast(gsi(71))
+	elseif stance ~= 2457 and sir(gsi(ms),t)==1 then
+		cast(gsi(2457))
+	end
+end
+if php &amp;lt; 30 and GetItemCount(5512,false,false) &amp;gt; 0 and ( select(2, GetItemCooldown(5512)) == 0 ) then
+    UseItemByName(5512)
+end
+if php&amp;lt;=25 and check(shw) then
+	cast(gsi(shw))
+end
+if php&amp;lt;=25 and check(dbts) then
+	cast(gsi(dbts))
+end
+if php&amp;lt;=25 and CanHealPot() then
+	UseItemByName(drinkme)
+end
+if php&amp;lt;=15 and check(rc) then
+	cast(gsi(rc))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Hamstring</Name><Default>false</Default><SpellID>100</SpellID><Actions></Actions><Lua>if plvl &amp;gt;= 36 then
+	if PQR_CheckUIError(SPELL_FAILED_IMMUNE)==true then
+		if UnitExists(t) then
+			hamtar = UnitGUID(t)
+			hamstr = false
+		end
+	end
+	if outcom or UnitExists(t) then
+		if outcom or UnitGUID(t)~=hamtar then
+			hamstr = true
+		end
+	end
+	if incom 
+		and check(ham) 
+		and not udbid(t,ham,p) 
+		and not SpecialUnit() 
+		and hamstr 
+	then
+		cast(gsi(ham))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Heroic Leap</Name><Default>false</Default><SpellID>57755</SpellID><Actions></Actions><Lua>--if IsLeftShiftKeyDown() then 
+--	SpellStopCasting() 
+--end
+if --(outcom or (incom and csr &amp;gt; 0))
+	cd(hl)==0 
+	and IsLeftShiftKeyDown() 
+	and GetCurrentKeyBoardFocus()==nil 
+then 
+	cast(gsi(hl))
+	if SpellIsTargeting() then 
+		CameraOrSelectOrMoveStart() 
+		CameraOrSelectOrMoveStop() 
+	end 
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>True</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Impending Victory</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom 
+	and pow&amp;gt;=10 
+	and check(imp) 
+	and thp&amp;gt;=20 
+then
+	cast(gsi(imp))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Racials</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if incom
+	and ((SpecialUnit() and PQ_CD==CD_BossOnly) or PQ_CD==CD_Auto)  
+	and check(blf) 
+	and sir(gsi(ms),t)==1 
+	and (((csr&amp;gt;=5 or cd(cs)&amp;lt;=2) and (thp&amp;lt;=20 or ttd(t)&amp;gt;=69)) or ttd(t)&amp;lt;=19) 
+then
+	cast(gsi(blf))
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Tier 4</Name><Default>false</Default><SpellID>118000</SpellID><Actions></Actions><Lua>if plvl&amp;gt;=60 
+	and incom
+	and sir(gsi(ms),t) == 1 
+then
+	-- Dragon Roar
+	if check(dr) then
+		if AOEMode==0 and csr == 0 then
+			cast(gsi(dr))
+		end
+		if AOEMode==1 and ubid(p,bb) then
+			cast(gsi(dr))
+		end
+	end
+	-- Shockwave
+	if check(shk) then
+		cast(gsi(shk))
+	end
+	-- BladeStorm
+	if AOEMode==1
+		and ubid(p,bb)
+		and check(bls) 
+	then
+		cast(gsi(bls))
+	end
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability><Ability><Name>Offensive</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>--Synapse Springs
+if incom 
+	and GetInventoryItemCooldown(p,10) == 0
+	and ubid(p,bb)
+then
+	UseInventoryItem(10)
+end
+--Mogu Power Potion
+if incom 
+	and GetItemCount(76095,false,false) &amp;gt; 0 
+	and ( select(2, GetItemCooldown(76095)) == 0 ) 
+	and ((thp&amp;lt;20 and ubid(p,rk))
+		or HaveBuff(p,{90355,80353,2825,32182})
+		or ttd(t)&amp;lt;=25)
+then
+    UseItemByName(76095)
+end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False</CancelChannel><SkipUnknown>True</SkipUnknown></Ability></WARRIOR>
