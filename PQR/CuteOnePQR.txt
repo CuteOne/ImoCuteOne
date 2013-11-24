@@ -10,23 +10,23 @@
 
 ----DRUID
 --FERAL
-https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/DRUID/CuteOne_DRUID_Abilities.xml
-https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/DRUID/CuteOne_DRUID_Rotations.xml
+https://github.com/CuteOne/ImoCuteOne/master/PQR/DRUID/CuteOne_DRUID_Abilities.xml
+https://github.com/CuteOne/ImoCuteOne/master/PQR/DRUID/CuteOne_DRUID_Rotations.xml
 ----SHAMAN
 --ENHANCEMENT
-https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/SHAMAN/CuteOne_SHAMAN_Abilities.xml
-https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/SHAMAN/CuteOne_SHAMAN_Rotations.xml
+https://github.com/CuteOne/ImoCuteOne/master/PQR/SHAMAN/CuteOne_SHAMAN_Abilities.xml
+https://github.com/CuteOne/ImoCuteOne/master/PQR/SHAMAN/CuteOne_SHAMAN_Rotations.xml
 ----WARRIOR
 --ARMS
-https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/WARRIOR/CuteOne_WARRIOR_Abilities.xml
-https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/WARRIOR/CuteOne_WARRIOR_Rotations.xml
+https://github.com/CuteOne/ImoCuteOne/master/PQR/WARRIOR/CuteOne_WARRIOR_Abilities.xml
+https://github.com/CuteOne/ImoCuteOne/master/PQR/WARRIOR/CuteOne_WARRIOR_Rotations.xml
 ----ROGUE
 --ASSASSINATION
-https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/ROGUE/CuteOne_ROGUE_Abilities.xml
-https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/ROGUE/CuteOne_ROGUE_Rotations.xml
+https://github.com/CuteOne/ImoCuteOne/master/PQR/ROGUE/CuteOne_ROGUE_Abilities.xml
+https://github.com/CuteOne/ImoCuteOne/master/PQR/ROGUE/CuteOne_ROGUE_Rotations.xml
 --MONK
-https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/MONK/CuteOne_MONK_Abilities.xml
-https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/MONK/CuteOne_MONK_Rotations.xml
+https://github.com/CuteOne/ImoCuteOne/master/PQR/MONK/CuteOne_MONK_Abilities.xml
+https://github.com/CuteOne/ImoCuteOne/master/PQR/MONK/CuteOne_MONK_Rotations.xml
 
 --DATA File
-https://github.com/CuteOne/ImoCuteOne/blob/master/PQR/Data/PQR_CuteOne.lua
+https://raw.github.com/CuteOne/ImoCuteOne/master/PQR/Data/PQR_CuteOne.lua
