@@ -2,9 +2,9 @@
 if not cute then cute = {} end
 
 function cute.dummytest()	-- Dummy 5min DPS Test
+	local cTime = cute.timecheck()
+	local cDummy = cute.dummy()
 	if cute.exists(cute.t()) then			
-		local cTime = cute.timecheck()
-		local cDummy = cute.dummy()
 		if cTime >= 300 and cDummy then  
 			return true
 		else
@@ -15,7 +15,7 @@ end
 
 function cute.Ber()	--Berserk
 	if cute.ubid(cute.p(),768)	--Cat Form
-		and cute.pow() >= 75
+		and cute.pow() >= 70
 		and cute.ubid(cute.p(), 52610)	--Savage Roar
 		and cute.ubid(cute.p(), 5217)	--Tiger's Fury
 		and cute.sir(cute.gsi(33876),cute.t())
@@ -275,7 +275,11 @@ function cute.Prl() --Prowl
 end
 
 function cute.RK() --Rake
-	if cute.ubid(cute.p(),768) and cute.sir(cute.gsi(33876),cute.t()) and (cute.srr()>1 or cute.GlyphCheck(127540)==false) and cute.pow()>=35 then
+	if cute.ubid(cute.p(),768) 
+		and cute.sir(cute.gsi(33876),cute.t()) 
+		and (cute.srr()>1 or cute.GlyphCheck(127540)==false) 
+		and cute.pow()>=35 
+	then
 		if cute.rrr() > 0.5 
 			and cute.rkr() < 9 
 			and cute.rrr()<=1.5 
@@ -373,32 +377,36 @@ function cute.RP() --Rip
 end
 
 function cute.SR() --Savage Roar
-	if cute.ubid(cute.p(),768) and cute.cp()>=1 and cute.rpr()<=3 and cute.thp()<=25 then
-		return false
-	else
-		if not cute.ubid(cute.p(),108288) then
-			if (IsStealthed() or cute.combat()) 
-				and cute.attack() 
-				and cute.srr()<=1 
-				and cute.pow()>=25 
-				and (cute.GlyphCheck(127540) or cute.cp() > 0) 
-			then
-				return true
-			elseif	cute.combat() 
-				and (cute.GlyphCheck(127540) or cute.cp() > 0) 
-				and cute.rpr() > 0 
-				and cute.rpr() < 10 
-				and (12+(cute.cp()*6))>=(cute.srr()+12) 
-				and cute.srrpdiff()<=4 
-				and cute.pow()>=25 
-			then
-				return true
+	if cute.ubid(cute.p(),768) then
+		if cute.cp()>=1 and cute.rpr()<=3 and cute.thp()<=25 then
+			return false
+		else
+			if not cute.ubid(cute.p(),108288) then
+				if (IsStealthed() or cute.combat()) 
+					and cute.attack() 
+					and cute.srr()<=1 
+					and cute.pow()>=25 
+					and (cute.GlyphCheck(127540) or cute.cp() > 0) 
+				then
+					return true
+				elseif	cute.combat() 
+					and (cute.GlyphCheck(127540) or cute.cp() > 0) 
+					and cute.rpr() > 0 
+					and cute.rpr() < 10 
+					and (12+(cute.cp()*6))>=(cute.srr()+12) 
+					and cute.srrpdiff()<=4 
+					and cute.pow()>=25 
+				then
+					return true
+				else
+					return false
+				end
 			else
 				return false
 			end
-		else
-			return false
 		end
+	else
+		return false
 	end
 end
 
@@ -430,7 +438,7 @@ function cute.RkF() --Rake: Filler
 	then
 		if (cute.ttd(cute.t()) - cute.rkr()) > 3 
 			--and ((cute.crkd() * ((cute.rkr()/3) + 1)) - (cute.rkd() * (cute.rkr()/3))) > cute.mgld()
-			and ((cute.crkd() * (cute.rkr() + 1)) - (cute.rkd() * cute.rkr())) > cute.mgld()
+			and ((cute.crkd() * ((cute.rkr()/3) + 1)) - (cute.rkd() * (cute.rkr()/3))) > cute.mgld()
 		then
 			return true
 		else
@@ -517,7 +525,7 @@ function cute.Thr() --Thrash
 	if cute.combat()
 		and cute.ubid(cute.p(),768)
 		and cute.plvl()>=28
-		and (cute.pow()>=50 or cute.ubid(cute.p(),135700))
+		and cute.pow()>=50
 		and cute.sir(cute.gsi(33876),cute.t())
 		and cute.ttd(cute.t())>=6
 		and (cute.bossID()~=69700 or cute.bossID()~=69701)

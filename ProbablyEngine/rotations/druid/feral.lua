@@ -2,21 +2,14 @@
 -- Custom Feral Combat Druid Rotation
 -- Created on Nov 2nd 2013 10:35 pm
 
- ProbablyEngine.rotation.register_custom(103, "CuteOne - Feral", 
+ ProbablyEngine.rotation.register_custom(103, "ImoCuteOne - Feral", 
  
  {	 --In Combat
- 
- {"!/ClearTarget", {
-	"@cute.dummytest()",
- }},
- 
- -- {"!/print(5 Minute Dummy Test Concluded - Profile Stopped)", {
-	-- "@cute.dummytest()",
- -- }},
- 
- -- {"!/StopAttack", {
-	-- "@cute.dummytest()",
- -- }},
+ {{	--Dummy Rotation Test
+	--{"!/print(5 Minute Dummy Test Concluded - Profile Stopped)"},
+	--{"!/stopattack"},
+	{"!/cleartarget"},
+ }, {"player.time >= 300", "@cute.dummy()"}},
  
  {"pause", {	--Pause Rotation
 	"@cute.Pause()"
@@ -222,6 +215,10 @@
  }, "modifier.multitarget"},
  
  {{		--Single Rotation
+	{"106830", {	--Thrach - Clearcasting Proc
+		"@cute.ThrCC()"
+	}},
+ 
 	{"127538", {	--Savage Roar
 		"@cute.SR()",
 	}}, 
@@ -247,7 +244,12 @@
 		"@cute.FB()",
 	}, "target"},
 	
-	{"5185", {		--Healing Touch
+	-- {"5185", { --Healing Touch - Lowest Raid Member
+		-- "@cute.HT()",
+		-- "lowest.exists",
+	-- }, "lowest"},
+	
+	{"5185", {		--Healing Touch - Self Default
 		"@cute.HT()",
 	}, "player"}, 
 	

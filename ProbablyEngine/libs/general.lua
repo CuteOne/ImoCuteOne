@@ -65,9 +65,6 @@ end
 function cute.udbid(unit, spellid, filter)
 	return UnitDebuffID(unit, spellid, filter)
 end
-function cute.pow()
-	return UnitPower("player")
-end
 function cute.pow()			
 	if UnitBuffID("player",135700) then
 		return 999

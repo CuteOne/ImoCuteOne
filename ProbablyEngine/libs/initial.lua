@@ -1,15 +1,6 @@
 -- Initialize tables
 if not cute then cute = {} end
 
--- Data File Functions
--- cute.ttd(cute.t())
- --cute.GroupInfo()
- --cute.behind()
--- --cute.SymMem()
---cute.dummy()
---cute.timecheck()
-
-
 -- cute.SpellList = {  
 -- ------ABILITIES-------
 -- af	=	1066,	--Aquatic Form
