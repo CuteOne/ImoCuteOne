@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?><MONK><Ability><Name>Initial</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if PQR_RotationStarted == true then
 	PQR_RotationStarted = false
 	if PQR_LoadLua ~= nil then
-   		if PQR_LoadLua(&amp;quot;PQR_CuteOne.lua&amp;quot;) == false then 
-      		PQR_WriteToChat(&amp;quot;Put PQR_CuteOne.lua in the data folder.&amp;quot;, &amp;quot;Error&amp;quot;)
+   		if PQR_LoadLua(&amp;quot;PQR_ImoCuteOne.lua&amp;quot;) == false then 
+      		PQR_WriteToChat(&amp;quot;Put PQR_ImoCuteOne.lua in the data folder.&amp;quot;, &amp;quot;Error&amp;quot;)
       		PQR_StopRotation()
        		return true
 		end

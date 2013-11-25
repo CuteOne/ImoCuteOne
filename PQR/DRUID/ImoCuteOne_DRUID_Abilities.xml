@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?><DRUID><Ability><Name>Initial</Name><Default>false</Default><SpellID>0</SpellID><Actions></Actions><Lua>if PQR_RotationStarted == true then
 	PQR_RotationStarted = false
 	if PQR_LoadLua ~= nil then
-   		if PQR_LoadLua(&amp;quot;PQR_CuteOne.lua&amp;quot;) == false then 
-      		PQR_WriteToChat(&amp;quot;Put PQR_CuteOne.lua in the data folder.&amp;quot;, &amp;quot;Error&amp;quot;)
+   		if PQR_LoadLua(&amp;quot;PQR_ImoCuteOne.lua&amp;quot;) == false then 
+      		PQR_WriteToChat(&amp;quot;Put PQR_ImoCuteOne.lua in the data folder.&amp;quot;, &amp;quot;Error&amp;quot;)
       		PQR_StopRotation()
        		return true
 		end
@@ -391,7 +391,7 @@ if IsRightShiftKeyDown() and not GetCurrentKeyBoardFocus() and GetTime() - PQ_AO
 		PQ_AOE = false
 		AOEMode = 0
 		PQ_Rot = &amp;quot;Single&amp;quot;
-		PQR_SwapRotation(&amp;quot;Kitty-Single (CuteOne)&amp;quot;)
+		PQR_SwapRotation(&amp;quot;Kitty-Single (ImoCuteOne)&amp;quot;)
 		Nova_Notify(&amp;quot;|cff347C2CAOE Mode: |cffDC143CSingle|cffffffff&amp;quot;)
 	elseif AOEMode==0 then
 		PQ_AOE = false
@@ -403,7 +403,7 @@ if IsRightShiftKeyDown() and not GetCurrentKeyBoardFocus() and GetTime() - PQ_AO
 		AOEMode = 2
 		PQ_Rot = &amp;quot;Multi&amp;quot;
 		Nova_Notify(&amp;quot;|cff347C2CAOE Mode: |cff006400Multi|cffffffff&amp;quot;)
-		PQR_SwapRotation(&amp;quot;Kitty-Multi (CuteOne)&amp;quot;)
+		PQR_SwapRotation(&amp;quot;Kitty-Multi (ImoCuteOne)&amp;quot;)
 	end
 end
 

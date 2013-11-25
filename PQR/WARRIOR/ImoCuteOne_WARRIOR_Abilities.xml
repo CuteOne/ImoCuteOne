@@ -85,9 +85,9 @@ end</Lua><RecastDelay>0</RecastDelay><Target>Target</Target><CancelChannel>False
   PQR_RotationStarted = false
   if PQR_LoadLua ~= nil
   then
-   		if PQR_LoadLua(&amp;quot;PQR_CuteOne.lua&amp;quot;) == false
+   		if PQR_LoadLua(&amp;quot;PQR_ImoCuteOne.lua&amp;quot;) == false
    		then 
-      			PQR_WriteToChat(&amp;quot;Put PQR_CuteOne.lua in the data folder.&amp;quot;, &amp;quot;Error&amp;quot;)
+      			PQR_WriteToChat(&amp;quot;Put PQR_ImoCuteOne.lua in the data folder.&amp;quot;, &amp;quot;Error&amp;quot;)
       			PQR_StopRotation()
        			return true
   		end
