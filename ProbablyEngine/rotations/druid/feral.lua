@@ -98,7 +98,7 @@ cute.rpd()
 	}}, 
 	
 	{"768", {		--Cat Form (Return from Might of Ursoc)
-		"!player.budd(768)",
+		"!player.buff(768)",
 		"player.buff(106922)",
 		"player.buff(22842)",
 	}},
@@ -309,6 +309,8 @@ cute.rpd()
  
 	{"768", { 		--Cat Form
 		"@cute.CF()",
+		"target.enemy",
+		"target.alive",
 	}},
  
 	{"1066", {		--Aquatic Form
@@ -372,6 +374,8 @@ cute.rpd()
  
 	{"127538", {	--Savage Roar
 		"@cute.SR()",
+		"target.enemy",
+		"target.alive"
 	}}, 
  
 	{"Ravage", {		--Ravage - Opener
