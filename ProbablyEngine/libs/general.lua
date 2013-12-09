@@ -203,12 +203,33 @@ if not Nova_Notify then
  Nova_NotifyFrameTime = 0
 end
 
-function cute.thp()
-	if UnitHealthMax("target")==0 or UnitHealthMax("target")==nil then
-		return 0
-	else
-		return 100*(UnitHealth("target")/UnitHealthMax("target"))
-	end
+---Spell Check
+cute.check = nil
+function cute.check(spell, unit)
+	unit = unit or t;
+    --spell = string.format("%s",GetSpellInfo(sp))
+    if UnitExists(unit) 
+   		and UnitCanAttack("player", unit) == 1
+   		and not UnitIsDeadOrGhost(unit)
+    	and not PQR_IsOutOfSight(unit, 1)
+    	--and IsSpellKnown(spell)
+    	and PQR_SpellAvailable(spell)
+    	--and IsPlayerSpell(spell)
+    	and IsUsableSpell(spell)==1
+    	and GetSpellCooldown(spell)==0
+    then 
+       	if SpellHasRange(spell)==1 then
+           	if IsSpellInRange(GetSpellInfo(spell),unit)~=1 then
+       			return false
+       		else
+       			return true
+       		end
+    	else
+	   		return true
+    	end
+   	else 
+    	return false
+    end
 end
 
 -- function cute.LineOfSight(target)		--Line of Sight Check

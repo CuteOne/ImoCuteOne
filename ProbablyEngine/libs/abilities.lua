@@ -15,7 +15,7 @@ end
 
 function cute.Ber()	--Berserk
 	if cute.ubid(cute.p(),768)	--Cat Form
-		and cute.pow() >= 70
+		and cute.pow() >= 75
 		and cute.ubid(cute.p(), 52610)	--Savage Roar
 		and cute.ubid(cute.p(), 5217)	--Tiger's Fury
 		and cute.sir(cute.gsi(33876),cute.t())
@@ -164,7 +164,8 @@ function cute.HT() --Healing Touch
 end
 
 function cute.MA() --Maim
-	if (select(2,GetInstanceInfo())=="arena" or select(2,GetInstanceInfo())=="pvp") then
+	if (select(2,GetInstanceInfo())=="arena" or select(2,GetInstanceInfo())=="pvp") 
+		then
 		return true
 	else
 		return false
@@ -267,7 +268,11 @@ function cute.Pnc() --Pounce
 end
 
 function cute.Prl() --Prowl
-	if not cute.combat() and not IsStealthed() and cute.attack() and cute.ubid(cute.p(),768) then
+	if not cute.combat() 
+		and not IsStealthed() 
+		and cute.attack() 
+		and cute.ubid(cute.p(),768) 
+	then
 		return true
 	else
 		return false
@@ -323,7 +328,7 @@ function cute.Rvg() --Ravage: Opener
 end
 
 function cute.Rej() --Rejuvination
-	if  not SpellIsTargeting()
+	if not SpellIsTargeting()
 		and (not cute.combat() or cute.plvl()<26) 
 		and not cute.ubid(cute.p(),774) 
 	then 
@@ -363,7 +368,7 @@ function cute.RP() --Rip
 		then
 			return true
 		elseif cute.cp()>=5 
-			and	((cute.rpr() < 6 and cute.thp() > 25) 
+			and	((cute.rpr() < 2 and cute.thp() > 25) 
 				or (cute.rpp() > 108 and (cute.rscbuff() == 0 or cute.rscbuff>=7)) 
 			and cute.ttd(cute.t())>=15)
 		then
@@ -377,8 +382,9 @@ function cute.RP() --Rip
 end
 
 function cute.SR() --Savage Roar
-	if cute.ubid(cute.p(),768) then
-		if cute.cp()>=1 and cute.rpr()<=3 and cute.thp()<=25 then
+	if cute.ubid(cute.p(),768) 
+	then
+		if cute.cp()>=1 and cute.rpr() > 0 and cute.rpr()<=3 and cute.thp()<=25 then
 			return false
 		else
 			if not cute.ubid(cute.p(),108288) then
@@ -471,8 +477,7 @@ function cute.ShrF() --Shred: Filler (Glyph)
 end
 
 function cute.MglF() --Mangle: Filler
-	if cute.ubid(cute.p(),768) 
-		and cute.combat() 
+	if cute.combat() 
 		and not IsStealthed() 
 		and cute.sir(cute.gsi(33876),cute.t()) 
 		and cute.cp() < 5 
@@ -498,7 +503,8 @@ end
 	-- end
 -- end
 function cute.ThrCC()	--Thrash: Clearcasting Proc
-	if cute.ubid(cute.p(),135700) then
+	if cute.ubid(cute.p(),135700) 
+	then
 		if cute.combat() 
 			and cute.sir(cute.gsi(33876),cute.t()) 
 			and cute.ubid(cute.p(),768) 
@@ -559,7 +565,9 @@ end
 -- end
 
 function cute.ThrAoE() --Thrash: AoE
-	if cute.pow()>=50 and cute.rrr() > 0 or cute.thrr() < 3 or (cute.ubid(cute.p(),5217) and cute.thrr() < 9) then 
+	if cute.pow()>=50 
+		and (cute.rrr() > 0 or cute.thrr() < 3 or (cute.ubid(cute.p(),5217)	and cute.thrr() < 9)) 
+	then 
 		return true
 	else
 		return false
@@ -567,7 +575,8 @@ function cute.ThrAoE() --Thrash: AoE
 end
 
 function cute.KotJ() --Tier 4 Talent: King of the Jungle
-	if cute.ttd(cute.t())>=15 then 
+	if cute.ttd(cute.t())>=15 
+	then 
 		return true
 	else
 		return false
@@ -575,10 +584,10 @@ function cute.KotJ() --Tier 4 Talent: King of the Jungle
 end
 
 function cute.FoN() --Tier 4 Talent: Force of Nature
-	if (((cute.dex() > 0 and cute.dex()<=1) or cute.ubid(cute.p(),146310)) and GetSpellCharges(106737)> 0)
+	if cute.TalentCheck(106737) and ((((cute.dex() > 0 and cute.dex()<=1) or cute.ubid(cute.p(),146310)) and GetSpellCharges(106737)> 0)
 		or (GetSpellCharges(106737) == 3 and cute.rrr()==0 and cute.rscr()==0 and cute.Nova_CheckLastCast(106737,1))
 		or (((cute.rscr() < 5 and cute.rscbuff()==10) or (cute.rrr() > 0 and cute.rrr() < 1)) and GetSpellCharges(106737) > 0)
-		or (cute.ttd(cute.t()) < 20 and GetSpellCharges(106737) > 0)
+		or (cute.ttd(cute.t()) < 20 and GetSpellCharges(106737) > 0))
 	then
 		return true
 	else

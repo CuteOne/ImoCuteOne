@@ -269,3 +269,4 @@ function cute.canshr()		--Shred Check
 		return false
 	end
 end
+

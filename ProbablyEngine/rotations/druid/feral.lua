@@ -1,6 +1,10 @@
 -- ProbablyEngine Rotation Packager
 -- Custom Feral Combat Druid Rotation
 -- Created on Nov 2nd 2013 10:35 pm
+cute.crkd()
+cute.rkd()
+cute.crpd()
+cute.rpd()
 
  ProbablyEngine.rotation.register_custom(103, "ImoCuteOne - Feral", 
  
@@ -31,7 +35,8 @@
  
 	{"33786", {		--Cyclone: Focus Target
 		"@cute.Cy()",
-		"player.spell(33786).cooldown = 0"
+		"player.spell(33786).cooldown = 0",
+		"player.spell(33786).exists"
 	}, "focus"},
 	
 	{"5211", {		--Mighty Bash
@@ -39,12 +44,14 @@
 		"player.range <= 8",
 		"player.spell(80965).cooldown != 0",	--Skull Bash
 		"player.spell(80965).cooldown <= 14",	--Skull Bash
-		"target.casting"
+		"target.casting",
+		"player.spell(5211).exists"
 	}, "target"}, 
 	
 	{"80965", {		--Skull Bash
 		"player.spell(80965).cooldown = 0",	--Skull Bash
-		"target.casting"
+		"target.casting",
+		"player.spell(80965).exists"
 	}, "target"},
 	
 	-- {"132469", {	--Typhoon
@@ -68,22 +75,26 @@
  
 	{"22812", {		--Barkskin
 		"!player.buff(5215)",	--Prowl
-		"player.health <= 50"
+		"player.health <= 50",
+		"player.spell(22812).exists"
 	}}, 
 	
 	{"106922", {	--Might of Ursoc
 		"!player.buff(5215)",	--Prowl
-		"player.health <= 30"
+		"player.health <= 30",
+		"player.spell(106922).exists"
 	}}, 
 	
 	{"61336", {		--Survival Instincts
 		"!player.buff(5215)",	--Prowl
-		"player.health <= 25"
+		"player.health <= 25",
+		"player.spell(61336).exists"
 	}}, 
 	
 	{"22842", {		--Frenzied Regeneration
 		"!player.buff(5215)",	--Prowl
-		"player.buff(106922)"
+		"player.buff(106922)",
+		"player.spell(22842).exists"
 	}}, 
 	
 	{"768", {		--Cat Form (Return from Might of Ursoc)
@@ -123,7 +134,6 @@
 	
 	{"106951", {	--Berserk
 		"@cute.Ber()",
-		"target.boss"
 	}}, 
 	
 	{"106731", {	--Tier 4 Talent: Incarnation - King of the Jungle
@@ -144,6 +154,7 @@
 		"player.spell(106737).cooldown = 0",	--Force of Nature
 		"player.range <= 8"
 	}}, 
+
 	{"124974", {	--Tier 6 Talent: Nature's Vigil
 		"@cute.NV()",
 		"player.spell(124974).exists",	--Nature's Vigil
@@ -215,7 +226,7 @@
  }, "modifier.multitarget"},
  
  {{		--Single Rotation
-	{"106830", {	--Thrach - Clearcasting Proc
+	{"106830", {	--Thrash - Clearcasting Proc
 		"@cute.ThrCC()"
 	}},
  
@@ -379,4 +390,5 @@
 		"@cute.Pause()",
 	}}, 
  
- })
+ }
+ )
