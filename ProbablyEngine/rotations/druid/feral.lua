@@ -370,6 +370,8 @@ cute.rpd()
  
 	{"5215", {		--Prowl
 		"@cute.Prl()",
+		"target.enemy",
+		"target.alive"
 	}}, 
  
 	{"127538", {	--Savage Roar
