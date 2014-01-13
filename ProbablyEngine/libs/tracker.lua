@@ -39,7 +39,9 @@ function SlashCmdList.BAR(msg, editbox)
 		Cute_Frame:Show() 
 		Cute_Frame2:Show() 
 		Cute_Frame3:Show() 
-		Cute_Frame4:Show() 		
+		Cute_Frame4:Show()
+		Cute_Frame5:Show() 
+		Cute_Frame6:Show()  		
 		FrameShown = true
 	else
 		print("|cffff7d0aDisactivated Display")
@@ -47,6 +49,8 @@ function SlashCmdList.BAR(msg, editbox)
 		Cute_Frame2:Hide() 
 		Cute_Frame3:Hide() 	
 		Cute_Frame4:Hide() 	
+		Cute_Frame5:Hide() 
+		Cute_Frame6:Hide() 
 		FrameShown = nil
 	end
 end
@@ -54,16 +58,16 @@ end
 -- Mettre a jour les valeurs chaque frame.
 function Cute_FrameUpdate(self, elapsed)
 	-- Frame 1
-	if cute.rkp() ~= nil and UnitDebuffID("Target", 1822, "Player") then
-		local rkpDisplay = math.floor(cute.rkp())
+	if ProbablyEngine.dsl.get("rkp")() ~= nil and UnitDebuffID("Target", 1822, "Player") then
+		local rkpDisplay = math.floor(ProbablyEngine.dsl.get("rkp")())
 		--if rkpDisplay > 1000 then
 			Cute_Frame.Text:SetText((math.floor(rkpDisplay)).."%") 
 		--else 
 		--	Cute_Frame.Text:SetText(rkpDisplay) 
 		--end
-		Cute_Frame:SetValue(cute.rkp())
+		Cute_Frame:SetValue(ProbablyEngine.dsl.get("rkp")())
 		-- Status Color
-		if cute.rkp() > 108 then
+		if ProbablyEngine.dsl.get("rkp")() > 108 then
 			Cute_Frame:GetStatusBarTexture():SetTexture(0/255, 255/255, 0/255,0.75,"OVERLAY")
 		else
 			Cute_Frame:GetStatusBarTexture():SetTexture(217/255, 0/255, 0/255,0.75,"OVERLAY")
@@ -73,31 +77,31 @@ function Cute_FrameUpdate(self, elapsed)
 		Cute_Frame.Text:SetText("RKP")
 	end
 	-- Frame 2
-	if cute.rkd() ~= nil and UnitDebuffID("Target", 1822, "Player") then
-		local rkdDisplay = math.floor(cute.rkd())
+	if ProbablyEngine.dsl.get("rkd")() ~= nil and UnitDebuffID("Target", 1822, "Player") then
+		local rkdDisplay = math.floor(ProbablyEngine.dsl.get("rkd")())
 		if rkdDisplay > 1000 then
 			Cute_Frame2.Text:SetText((math.floor(rkdDisplay/1000)).."k") 
 		else 
 			Cute_Frame2.Text:SetText(rkdDisplay) 
 		end
-		Cute_Frame2:SetValue(cute.rkd())
+		Cute_Frame2:SetValue(ProbablyEngine.dsl.get("rkd")())
 		Cute_Frame2:GetStatusBarTexture():SetTexture(217/255, 0/255, 0/255,0.75,"OVERLAY")
 	else
 		Cute_Frame2:SetValue(0)
 		Cute_Frame2.Text:SetText("RKD")
 
-	end	
+	end
 	-- Frame 3
-	if cute.rpp()  ~= nil and UnitDebuffID("Target", 1079, "Player") then
-		local rppDisplay = math.floor(cute.rpp())
+	if ProbablyEngine.dsl.get("rpp")()  ~= nil and UnitDebuffID("Target", 1079, "Player") then
+		local rppDisplay = math.floor(ProbablyEngine.dsl.get("rpp")())
 		--if rppDisplay > 1000 then
 			Cute_Frame3.Text:SetText((math.floor(rppDisplay)).."%") 
 		--else 
 		--	Cute_Frame3.Text:SetText(rkpDisplay) 
 		--end
-		Cute_Frame3:SetValue(cute.rpp())
+		Cute_Frame3:SetValue(ProbablyEngine.dsl.get("rpp")())
 		-- Status Color
-		if cute.rpp() > 108 then
+		if ProbablyEngine.dsl.get("rpp")() > 108 then
 			Cute_Frame3:GetStatusBarTexture():SetTexture(0/255, 255/255, 0/255,0.75,"OVERLAY")
 		else
 			Cute_Frame3:GetStatusBarTexture():SetTexture(217/255, 0/255, 0/255,0.75,"OVERLAY")
@@ -107,20 +111,48 @@ function Cute_FrameUpdate(self, elapsed)
 		Cute_Frame3.Text:SetText("RPP")
 	end
 	-- Frame 4
-	if cute.rpd() ~= nil and UnitDebuffID("Target", 1079, "Player") then
-		local rpdDisplay = math.floor(cute.rpd())
+	if ProbablyEngine.dsl.get("rpd")() ~= nil and UnitDebuffID("Target", 1079, "Player") then
+		local rpdDisplay = math.floor(ProbablyEngine.dsl.get("rpd")())
 		if rpdDisplay > 1000 then
 			Cute_Frame4.Text:SetText((math.floor(rpdDisplay/1000)).."k") 
 		else 
 			Cute_Frame4.Text:SetText(rpdDisplay) 
 		end
-		Cute_Frame4:SetValue(cute.rpd())
+		Cute_Frame4:SetValue(ProbablyEngine.dsl.get("rpd")())
 		Cute_Frame4:GetStatusBarTexture():SetTexture(217/255, 0/255, 0/255,0.75,"OVERLAY")
 	else
 		Cute_Frame4:SetValue(0)
 		Cute_Frame4.Text:SetText("RPD")
 
 	end	
+	-- Frame 5
+	if ProbablyEngine.dsl.get("crkd")() ~= nil and UnitDebuffID("Target", 1822, "Player") then
+		local crkdDisplay = math.floor(ProbablyEngine.dsl.get("crkd")())
+		if crkdDisplay > 1000 then
+			Cute_Frame5.Text:SetText((math.floor(crkdDisplay/1000)).."k") 
+		else 
+			Cute_Frame5.Text:SetText(crkdDisplay) 
+		end
+		Cute_Frame5:SetValue(ProbablyEngine.dsl.get("crkd")())
+		Cute_Frame5:GetStatusBarTexture():SetTexture(217/255, 0/255, 0/255,0.75,"OVERLAY")
+	else
+		Cute_Frame5:SetValue(0)
+		Cute_Frame5.Text:SetText("CRKD")
+	end
+	-- Frame 6
+	if ProbablyEngine.dsl.get("crpd")() ~= nil and UnitDebuffID("Target", 1079, "Player") then
+		local crpdDisplay = math.floor(ProbablyEngine.dsl.get("crpd")())
+		if crpdDisplay > 1000 then
+			Cute_Frame6.Text:SetText((math.floor(crpdDisplay/1000)).."k") 
+		else 
+			Cute_Frame6.Text:SetText(crpdDisplay) 
+		end
+		Cute_Frame6:SetValue(ProbablyEngine.dsl.get("crpd")())
+		Cute_Frame6:GetStatusBarTexture():SetTexture(217/255, 0/255, 0/255,0.75,"OVERLAY")
+	else
+		Cute_Frame6:SetValue(0)
+		Cute_Frame6.Text:SetText("CRPD")
+	end
 end
 
 if Cute_Frame == nil then
@@ -288,5 +320,86 @@ if Cute_Frame == nil then
 	Cute_Frame4.Text:SetPoint("CENTER",0,0)
 	Cute_Frame4.Text:SetTextColor(PlayerFrameColorR, PlayerFrameColorG, PlayerFrameColorB,0.75)
 	Cute_Frame4:Hide() 
+	
+	LargeurBord = LargeurFrame + 8
+	HauteurBord = HauteurFrame + 8
+	Cute_Frame5 = CreateFrame("StatusBar", nil, Cute_Frame)
+	Cute_Frame5:SetBackdrop({
+		bgFile = [[Interface\DialogFrame\UI-DialogBox-Background-Dark]],
+		tile = true,
+		tileSize = 16,
+	})
+	Cute_Frame5:SetStatusBarTexture([[Interface\TARGETINGFRAME\UI-StatusBar]],"OVERLAY")
+	Cute_Frame5:SetOrientation("HORIZONTAL")
+	Cute_Frame5:SetStatusBarColor(1,1,1,1)
+	Cute_Frame5:SetBackdropColor(1,1,1,1)
+	Cute_Frame5:GetStatusBarTexture():SetTexture(PlayerFrameColorR, PlayerFrameColorG, PlayerFrameColorB,0.75,"OVERLAY")
+	Cute_Frame5:SetMinMaxValues(0, 15)
+	Cute_Frame5:SetWidth(LargeurFrame)
+	Cute_Frame5:SetHeight(HauteurFrame)
+	Cute_Frame5:SetPoint("CENTER",96,0)
+	Cute_Frame5:SetClampedToScreen(true)
+	Cute_Frame5:SetScript("OnUpdate", Cute_FrameUpdate)
+	Cute_Frame5:SetValue(0)
 
+	texture = Cute_Frame5:CreateTexture(nil, "BACKGROUND")
+	Cute_Frame5.texture = texture
+	Cute_Frame5.texture:SetAllPoints()
+	Cute_Frame5.texture:SetTexture(25/255,25/255,25/255,1)
+
+	border = Cute_Frame5:CreateTexture(nil, "BACKGROUND")
+	Cute_Frame5.Border = border
+	Cute_Frame5.Border:SetPoint("LEFT",-4,0)
+	Cute_Frame5.Border:SetWidth(LargeurBord)
+	Cute_Frame5.Border:SetHeight(HauteurBord)
+	Cute_Frame5.Border:SetTexture(PlayerFrameColorR, PlayerFrameColorG, PlayerFrameColorB,0.15)
+
+	bartext = Cute_Frame5:CreateFontString(nil, "OVERLAY")
+	Cute_Frame5.Text = bartext
+	Cute_Frame5.Text:SetFontObject("MovieSubtitleFont")
+	Cute_Frame5.Text:SetTextHeight(13)
+	Cute_Frame5.Text:SetPoint("CENTER",0,0)
+	Cute_Frame5.Text:SetTextColor(PlayerFrameColorR, PlayerFrameColorG, PlayerFrameColorB,0.75)
+	Cute_Frame5:Hide()
+	
+	LargeurBord = LargeurFrame + 8
+	HauteurBord = HauteurFrame + 8
+	Cute_Frame6 = CreateFrame("StatusBar", nil, Cute_Frame)
+	Cute_Frame6:SetBackdrop({
+		bgFile = [[Interface\DialogFrame\UI-DialogBox-Background-Dark]],
+		tile = true,
+		tileSize = 16,
+	})
+	Cute_Frame6:SetStatusBarTexture([[Interface\TARGETINGFRAME\UI-StatusBar]],"OVERLAY")
+	Cute_Frame6:SetOrientation("HORIZONTAL")
+	Cute_Frame6:SetStatusBarColor(1,1,1,1)
+	Cute_Frame6:SetBackdropColor(1,1,1,1)
+	Cute_Frame6:GetStatusBarTexture():SetTexture(PlayerFrameColorR, PlayerFrameColorG, PlayerFrameColorB,0.75,"OVERLAY")
+	Cute_Frame6:SetMinMaxValues(0, 15)
+	Cute_Frame6:SetWidth(LargeurFrame)
+	Cute_Frame6:SetHeight(HauteurFrame)
+	Cute_Frame6:SetPoint("CENTER",96,20)
+	Cute_Frame6:SetClampedToScreen(true)
+	Cute_Frame6:SetScript("OnUpdate", Cute_FrameUpdate)
+	Cute_Frame6:SetValue(0)
+
+	texture = Cute_Frame6:CreateTexture(nil, "BACKGROUND")
+	Cute_Frame6.texture = texture
+	Cute_Frame6.texture:SetAllPoints()
+	Cute_Frame6.texture:SetTexture(25/255,25/255,25/255,1)
+
+	border = Cute_Frame6:CreateTexture(nil, "BACKGROUND")
+	Cute_Frame6.Border = border
+	Cute_Frame6.Border:SetPoint("LEFT",-4,0)
+	Cute_Frame6.Border:SetWidth(LargeurBord)
+	Cute_Frame6.Border:SetHeight(HauteurBord)
+	Cute_Frame6.Border:SetTexture(PlayerFrameColorR, PlayerFrameColorG, PlayerFrameColorB,0.15)
+
+	bartext = Cute_Frame6:CreateFontString(nil, "OVERLAY")
+	Cute_Frame6.Text = bartext
+	Cute_Frame6.Text:SetFontObject("MovieSubtitleFont")
+	Cute_Frame6.Text:SetTextHeight(13)
+	Cute_Frame6.Text:SetPoint("CENTER",0,0)
+	Cute_Frame6.Text:SetTextColor(PlayerFrameColorR, PlayerFrameColorG, PlayerFrameColorB,0.75)
+	Cute_Frame6:Hide() 
 end

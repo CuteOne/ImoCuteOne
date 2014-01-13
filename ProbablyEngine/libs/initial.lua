@@ -1,272 +1,279 @@
 -- Initialize tables
 if not cute then cute = {} end
 
--- cute.SpellList = {  
--- ------ABILITIES-------
--- af	=	1066,	--Aquatic Form
--- bar	=	22812,	--Barkskin
--- bf	=	5487,	--Bear Form
--- ber	=	106951,	--Berserk
--- cf 	= 	768,	--Cat Form
--- cy	=	33786,	--Cyclone
--- dsh	=	1850,	--Dash
--- er	=	339,	--Entangling Roots
--- ff	=	770,	--Faerie Fire
--- fb	=	22568,	--Ferocious Bite
--- fr	=	22842,	--Frenzied Regeneration
--- grl	=	6795,	--Growl
--- ht	=	5185,	--Healing Touch
--- hib	=	2637,	--Hibernate
--- hur	=	16914,	--Hurricane
--- inn	=	29166,	--Innervate
--- lac =	33745,	--Lacerate
--- ma	=	22570,	--Maim
--- mgl	=	33876,	--Mangle
--- mbf	=	33878,	--Mangle: Bear Form
--- mow	=	1126,	--Mark of the Wild
--- ml	=	6807,	--Maul
--- mu	=	106922,	--Might of Ursoc
--- mf	=	8921,	--Moonfire
--- ng	=	16689,	--Nature's Grasp
--- pnc	=	9005,	--Pounce
--- prl	=	5215,	--Prowl
--- rk	=	1822,	--Rake
--- rvf =	102545,	--Ravage!
--- rvg	=	6785,	--Ravage
--- rb	=	20484,	--Rebirth
--- rej	=	774,	--Rejuvenation
--- rc	=	2782,	--Remove Corruption
--- rv	=	50769,	--Revive
--- rp	=	1079,	--Rip
--- sr	=	52610,	--Savage Roar
--- shr	=	5221,	--Shred
--- sb	=	80965,	--Skull Bash
--- sth	=	2908,	--Soothe
--- str	=	77764,	--Stampeding Roar
--- si	=	61336,	--Survival Instincts
--- sff	=	40120,	--Swift Flight Form
--- sw	=	62078,	--Swipe
--- swb	=	779,	--Swipe: Bear Form
--- sym	=	110309,	--Symbiosis
--- thr	=	106830,	--Thrash
--- thb	=	77758,	--Thrash: Bear Form
--- tf	=	5217,	--Tiger's Fury
--- tq	=	740,	--Tranquility
--- trf	=	783,	--Travel Form
--- wth =	5176,	--Wrath
+-- ProbablyEngine.condition.register("dummy",function() -- Dummy Check
+	-- cutedummies = {
+		-- 31146, --Raider's Training Dummy - Lvl ??
+		-- 67127, --Training Dummy - Lvl 90
+		-- 46647, --Training Dummy - Lvl 85
+		-- 32546, --Ebon Knight's Training Dummy - Lvl 80
+		-- 31144, --Training Dummy - Lvl 80
+		-- 32667, --Training Dummy - Lvl 70
+		-- 32542, --Disciple's Training Dummy - Lvl 65
+		-- 32666, --Training Dummy - Lvl 60
+		-- 32545, --Initiate's Training Dummy - Lvl 55 
+		-- 32541, --Initiate's Training Dummy - Lvl 55 (Scarlet Enclave) 
+	-- }
+	-- for i=1, #cutedummies do
+		-- if UnitExists("target") then
+			-- cutedummyID = tonumber(UnitGUID("target"):sub(-13, -9), 16)
+		-- else
+			-- cutedummyID = 0
+		-- end
+		-- if cutedummyID == cutedummies[i] then
+			-- return true
+		-- else
+			-- return false
+		-- end	
+	-- end
+-- end)
+local DSL = ProbablyEngine.dsl.get
+ 
 
--- ------Talents------
--- inc	=	106731,	--Incarnation: King of the Jungle
--- fon	=	106737,	--Force of Nature
--- how	=	108288,	--Heart of the Wild
--- mb	=	5211,	--Mighty Bash
--- nv	=	124974,	--Nature's Vigil
--- ty	=	132469,	--Typhoon
+local dummies = {
+  unitIDs = {
+    31146, --Raider's Training Dummy - Lvl ??
+    67127, --Training Dummy - Lvl 90
+    46647, --Training Dummy - Lvl 85
+    32546, --Ebon Knight's Training Dummy - Lvl 80
+    31144, --Training Dummy - Lvl 80
+    32667, --Training Dummy - Lvl 70
+    32542, --Disciple's Training Dummy - Lvl 65
+    32666, --Training Dummy - Lvl 60
+    32545, --Initiate's Training Dummy - Lvl 55 
+    32541, --Initiate's Training Dummy - Lvl 55 (Scarlet Enclave) 
+  }
+}
 
--- ------Racials------
--- rber =	26297,	--Troll Racial - Berserking	
+function dummies.check()
+  if not UnitExists('target') then return false end
 
--- ------PROCS------
--- ps	= 	69369,	--Predatory Swiftness
--- wa	= 	113746,	--Weakened Armor - Faerie Fire Debuff
--- cc 	= 	135700,	--Clearcasting
--- dcd	=	145152,	--Dream of Cenarius Damage Buff
--- srf =	114236,	--Shred Glyph
--- inb = 	102543,	--Incarnation: King of the Jungle buff
--- ro1	=	139121,	--Rune of Re-Origination: Haste
--- ro2	=	139117,	--Rune of Re-Origination: Critical Strike
--- ro3	=	139120,	--Rune of Re-Origination: Mastery
--- frf =	144865,	--Feral Fury
--- spd	=	81022,	--Stampede
+  local dummy = tonumber(UnitGUID('target'):sub(-13, -9), 16)
+  for i = 1, #dummies.unitIDs do
+    if dummy == dummies.unitIDs[i] then return true end
+  end
 
--- -----SYMBIOSIS SPELLS------
--- symdk	=	122282,	--Death Coil
--- symhtr	=	110597,	--Play Dead
--- symmag	=	110693,	--Frost Nova
--- symmon	=	126449,	--Clash
--- sympal	=	110700,	--Divine Shield
--- sympri	=	110715,	--Dispersion
--- symrog	=	110730,	--Redirect
--- symsha	=	110807,	--Feral Spirit
--- symloc	=	110810,	--Soul Swap
--- symwar	=	112997,	--Shattering Blow
--- }
+  return false
+end
 
-------BUFF/DEBUFF TRACKING------
--- Damage Formulas	
-function cute.dcb() 		--Dream of Cenarius Damage Modifier
-	if select(4,cute.ubid(cute.p(),145152)) == nil then
-		return 1
-	else 
-		return 1.3
+function cute.checkDummy()
+  if --DSL('toggle')('dummy')
+     DSL('time')() > 300
+     and dummies.check() then
+    StopAttack()
+    ClearTarget()
+    print('5 minute dummy test concluded - Profile Stopped')
+  end
+end
+
+ProbablyEngine.condition.register("ctime",function()				-- Rotation Timer
+	if cuteTimer == nil then
+		cuteTimer = 0
 	end
-end
-
-function cute.mgld() 		--Potential Mangle Damage
-	return (((((select(1, UnitDamage(cute.p())) + select(2, UnitDamage(cute.p())))/2)/2)*5)+(390*select(7,UnitDamage(cute.p()))))*cute.dcb()
-end
-
-function cute.crkd() 		--Potential Rake Dot Damage
-	return ((118 + (0.368 * UnitAttackPower(cute.p()))) * (1 + GetMasteryEffect() / 100) * 0.8154868 * select(7, UnitDamage(cute.p())))*cute.dcb()
-	--return floor((99 + (0.3*UnitAttackPower(cute.p())))*(1+(GetMasteryEffect()/100))*select(7, UnitDamage('player')))*cute.dcb()
-end
-
-function cute.rkd() 		--Active Rake Dot Damage
-	if cute.nDbDmg(cute.t(),1822,cute.p())~=nil then
-		return cute.nDbDmg(cute.t(),1822,cute.p())
-	else
-		return 1
+	if cutecTime == nil then
+		cutecTime = 0
 	end
-end
-
-function cute.rkp() 		--Percent Potential Rake Dot to Active Rake Dot
-	return cute.round2(((cute.crkd() / cute.rkd())*100),2)
-end
-
-function cute.crpd() 		--Potential Rip Dot Damage
-	return (floor(113 + 320 * cute.cp() * (1+(GetMasteryEffect()/100)) + 0.04851 * cute.cp() * UnitAttackPower(cute.p()) * (1+(GetMasteryEffect()/100)))*select(7, UnitDamage(cute.p())))*cute.dcb()
-end
-	
-function cute.rpd() 		--Active Rip Dot Damage
-	if cute.nDbDmg(cute.t(),1079,cute.p())~=nil then
-		return cute.nDbDmg(cute.t(),1079,cute.p())
-	else
-		return 1
+	if UnitAffectingCombat("player") and cuteTimer == 0 then
+		 cuteTimer = GetTime()
 	end
-end
+	if cuteTimer > 0 then
+		 cutecTime = (GetTime() - cuteTimer)
+	end
+	if not UnitAffectingCombat("player") and not UnitExists("target") then
+		cuteTimer = 0
+		cutecTime = 0
+	end
+	return cutecTime
+end)
 
-function cute.rpp() 		--Percent Potential Rip Dot to Active Rip Dot 
-	return cute.round2(((cute.crpd() / cute.rpd())*100),2)
-end
-
--- Duration Tracking
-function cute.rpr() 		--Rip Duration Tracking
-	if cute.udbid(cute.t(),1079,cute.p()) and cute.plvl() >= 20 then
-		return (select(7, cute.udbid(cute.t(),1079,cute.p())) - GetTime())
+ProbablyEngine.condition.register("power",function() 
+	if UnitBuffID("player",106951) then
+		return (UnitPower("player")*2)
+	elseif UnitBuffID("player",135700) then
+		return 100
 	else
-		if cute.plvl() < 20 then
+		return UnitPower("player")
+	end
+end)
+
+ProbablyEngine.condition.register("regen", function()
+  return select(2, GetPowerRegen("player"))
+end)
+
+ProbablyEngine.condition.register("rrr",function() 		--Rune of Reorigination Duration Tracking
+	if UnitBuffID("player",139121) then
+		return (select(7, UnitBuffID("player",139121)) - GetTime())
+	elseif UnitBuffID("player",139117) then
+		return (select(7, UnitBuffID("player",139117)) - GetTime())
+	elseif UnitBuffID("player",139120) then
+		return (select(7, UnitBuffID("player",139120)) - GetTime())
+	else
+		return 0
+	end
+end)
+ProbablyEngine.condition.register("thrr",function()		--Trash Duration Tracking
+	if UnitDebuffID("target",106830,"player") then
+		return (select(7, UnitDebuffID("target",106830,"player")) - GetTime())
+	else
+		return 0
+	end
+end)
+
+ProbablyEngine.condition.register("rkr",function()		--Rake Duration Tracking
+	if UnitDebuffID("target",1822,"player") then
+		return (select(7, UnitDebuffID("target",1822,"player")) - GetTime())
+	else
+		return 0
+	end
+end)
+
+ProbablyEngine.condition.register("rpr",function()
+	if UnitDebuffID("target",1079,"player") and UnitLevel("player") >= 20 then
+		return (select(7, UnitDebuffID("target",1079,"player")) - GetTime())
+	else
+		if UnitLevel("player") < 20 then
 			return 999
 		else
 			return 0
 		end
 	end
-end
+end)
 
-function cute.rkr()			--Rake Duration Tracking
-	if cute.udbid(cute.t(),1822,cute.p()) then
-		return (select(7, cute.udbid(cute.t(),1822,cute.p())) - GetTime())
-	else
-		return 0
-	end
-end
-
-function cute.srr() 		--Savage Roar Duration Tracking
-	if cute.ubid(cute.p(),127538) and cute.plvl() >= 18 then
-		return (select(7, cute.ubid(cute.p(),127538)) - GetTime())
-	else
-		if UnitLevel(cute.p()) < 18 then
-			return 999
+ProbablyEngine.condition.register("srr",function()
+	if ProbablyEngine.dsl.get("glyph")("player",127540) == true then
+		if UnitBuffID("player",127538) and UnitLevel("player") >= 18 then
+			return (select(7, UnitBuffID("player",127538)) - GetTime())
 		else
-			return 0
-		end
-	end
-end
-
-function cute.thrr()		--Trash Duration Tracking
-	if cute.udbid(cute.t(),106830,cute.p()) then
-		return (select(7, cute.udbid(cute.t(),106830,cute.p())) - GetTime())
-	else
-		return 0
-	end
-end
-
-function cute.rrr() 		--Rune of Reorigination Duration Tracking
-	if cute.ubid(cute.p(),139121) then
-		return (select(7, cute.ubid(cute.p(),139121)) - GetTime())
-	elseif cute.ubid(cute.p(),139117) then
-		return (select(7, cute.ubid(cute.p(),139117)) - GetTime())
-	elseif cute.ubid(cute.p(),139120) then
-		return (select(7, cute.ubid(cute.p(),139120)) - GetTime())
-	else
-		return 0
-	end
-end
-
-function cute.psr()			--Predatory Swiftness Duration Tracking
-	if cute.ubid(cute.p(),69369) then
-		return (select(7, cute.ubid(cute.p(),69369)) - GetTime())
-	else
-		return 0
-	end
-end
-
-function cute.war()			-- Weakened Armor Duration Tracking
-	if cute.udbid(cute.t(),113746) then
-		return (select(7, cute.udbid(cute.t(),113746)) - GetTime())
-	else
-		return 0
-	end
-end
-
-function cute.dex()			-- Assurance of Consequence Duration Tracking
-	if cute.ubid(cute.p(),146308) then
-		return (select(7,cute.ubid(cute.p(),146308)) - GetTime())
-	else
-		return 0
-	end
-end
-
-function cute.rscr()		-- Renataki's Soul Charm Duration Tracking
-	if cute.ubid(cute.p(), 138756) then
-		return (select(7, cute.ubid(cute.p(), 138756)) - GetTime())
-	else
-		return 0
-	end
-end
-
--- Stack Counts
-function cute.rscbuff() 	--Renataki's Soul Charm Buff Count
-	if cute.ubid(cute.p(), 138756) then
-		return select(4,cute.ubid(cute.p(),138737))
-	else
-		return 0
-	end
-end
-
-function cute.wac()			--Weakened Armer Stack Count
-	if cute.udbid(cute.t(),113746) then
-		return select(4, cute.udbid(cute.t(),113746))	
-	else
-		return 0
-	end
-end
-
--- Other
-function cute.srrpdiff()	--Savage Roar / Rip Tracking Comparison
-	if cute.plvl() >= 20 then
-		if (cute.rpr() - cute.srr()) < 0 then
-			return -(cute.rpr() - cute.srr())
-		else
-			return (cute.rpr() - cute.srr())
+			if UnitLevel("player") < 18 then
+				return 999
+			else
+				return 0
+			end
 		end
 	else
-		return 0
+		if UnitBuffID("player",52610) and UnitLevel("player") >= 18 then
+			return (select(7, UnitBuffID("player",52610)) - GetTime())
+		else
+			if UnitLevel("player") < 18 then
+				return 999
+			else
+				return 0
+			end
+		end
 	end
-end
-
-function cute.bossID() 		--Target ID Check
-	if cute.exists() then
-		return tonumber(UnitGUID(cute.t()):sub(-13, -9), 16)
-	else
-		return 0
-	end
-end
-
-function cute.canshr()		--Shred Check
-	if ((cute.ubid(cute.p(),106951) or cute.ubid(cute.p(),5217)) and cute.GlyphCheck(114234)) or cute.behind(cute.t()) then
+end)
+ProbablyEngine.condition.register("srt",function()	--Total Sasvage Roar Time
+	if (12 + (GetComboPoints("player")*6)) > (ProbablyEngine.dsl.get("srr")() + 12) then
 		return true
 	else
 		return false
 	end
-end
+end)
+ProbablyEngine.condition.register("srrpdiff",function()	--Savage Roar / Rip Duration Difference
+	if UnitLevel("player") >= 20 then
+		if (ProbablyEngine.dsl.get("rpr")() - ProbablyEngine.dsl.get("srr")()) < 0 then
+			return -(ProbablyEngine.dsl.get("rpr")()  - ProbablyEngine.dsl.get("srr")())
+		else
+			return (ProbablyEngine.dsl.get("rpr")() - ProbablyEngine.dsl.get("srr")())
+		end
+	else
+		return 0
+	end
+end)
 
+ProbablyEngine.condition.register("dcb",function() 		--Dream of Cenarius Damage Modifier
+	if select(4,UnitBuffID("player",145152)) == nil then
+		return 1
+	else 
+		return 1.3
+	end
+end)
+
+ProbablyEngine.condition.register("mgld",function() 		--Potential Mangle Damage
+	return (((((select(1, UnitDamage("player")) + select(2, UnitDamage("player")))/2)/2)*5)+(390*select(7,UnitDamage("player"))))*ProbablyEngine.dsl.get("dcb")()
+end)
+
+ProbablyEngine.condition.register("crkd",function() 		--Potential Rake Dot Damage
+	return ((118 + (0.368 * UnitAttackPower("player"))) * (1 + GetMasteryEffect() / 100) * 0.8154868 * select(7, UnitDamage("player")))*ProbablyEngine.dsl.get("dcb")()
+end)
+	
+ProbablyEngine.condition.register("rkd",function() 		--Active Rake Dot Damage
+	if nDbDmg("target",1822,"player")~=nil then
+		return nDbDmg("target",1822,"player")
+	else
+		return 100
+	end
+end)
+
+ProbablyEngine.condition.register("rkp",function() 		--Percent Potential Rip Dot to Active Rip Dot 
+	return round2(((ProbablyEngine.dsl.get("crkd")() / ProbablyEngine.dsl.get("rkd")())*100),2)
+end)
+
+ProbablyEngine.condition.register("crpd",function() 		--Potential Rip Dot Damage
+	return (floor(113 + 320 * GetComboPoints("player") * (1+(GetMasteryEffect()/100)) + 0.04851 * GetComboPoints("player") * UnitAttackPower("player") * (1+(GetMasteryEffect()/100)))*select(7, UnitDamage("player")))*ProbablyEngine.dsl.get("dcb")()
+end)
+	
+ProbablyEngine.condition.register("rpd",function() 		--Active Rip Dot Damage
+	if nDbDmg("target",1079,"player")~=nil then
+		return nDbDmg("target",1079,"player")
+	else
+		return 100
+	end
+end)
+
+ProbablyEngine.condition.register("rpp",function() 		--Percent Potential Rip Dot to Active Rip Dot 
+	return round2(((ProbablyEngine.dsl.get("crpd")() / ProbablyEngine.dsl.get("rpd")())*100),2)
+end)
+
+ProbablyEngine.condition.register("dex",function()		-- Assurance of Consequence Duration Tracking
+	if UnitBuffID("player",146308) then
+		return (select(7,UnitBuffID("player",146308)) - GetTime())
+	else
+		return 0
+	end
+end)
+
+ProbablyEngine.condition.register("rscr",function()		-- Renataki's Soul Charm Duration Tracking
+	if UnitBuffID("player", 138756) then
+		return (select(7, UnitBuffID("player", 138756)) - GetTime())
+	else
+		return 0
+	end
+end)
+
+-- Stack Counts
+ProbablyEngine.condition.register("rscbuff",function() 	--Renataki's Soul Charm Buff Count
+	if UnitBuffID("player", 138756) then
+		return select(4,UnitBuffID("player", 138756))
+	else
+		return 0
+	end
+end)
+
+ProbablyEngine.condition.register("canshr",function()	--I can has Shred?
+	if ((UnitBuffID("player",106951) or UnitBuffID("player",5217)) and ProbablyEngine.dsl.get("glyph")("player",114234) == true) or ProbablyEngine.dsl.get("behind")("target") == true then
+		return true
+	else
+		return false
+	end
+end)
+
+ProbablyEngine.condition.register("rkfil",function() --Rake Filler
+	if ProbablyEngine.dsl.get("ttd")("target") > 3 
+		and ProbablyEngine.dsl.get("crkd")()*((ProbablyEngine.dsl.get("rkr")() / 3 ) + 1 ) - ProbablyEngine.dsl.get("rkd")()*(ProbablyEngine.dsl.get("rkr")()/3) > ProbablyEngine.dsl.get("mgld")() 
+	then
+		return true
+	else
+		return false
+	end
+end)
+
+ProbablyEngine.condition.register("rerk",function() --Rake Override
+	if ProbablyEngine.dsl.get("ttd")("target") - ProbablyEngine.dsl.get("rkr")() > 3 
+		and (ProbablyEngine.dsl.get("rkp")() > 108 or (ProbablyEngine.dsl.get("rkr")() < 3 and ProbablyEngine.dsl.get("rkp")() >= 75))
+	then
+		return true
+	else 
+		return false
+	end
+end)

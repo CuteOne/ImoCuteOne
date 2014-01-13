@@ -1,400 +1,681 @@
 -- ProbablyEngine Rotation Packager
 -- Custom Feral Combat Druid Rotation
 -- Created on Nov 2nd 2013 10:35 pm
-cute.crkd()
-cute.rkd()
-cute.crpd()
-cute.rpd()
 
- ProbablyEngine.rotation.register_custom(103, "ImoCuteOne - Feral", 
- 
+ ProbablyEngine.rotation.register_custom(103, "CuteOne - Feral", 
+
  {	 --In Combat
- {{	--Dummy Rotation Test
-	--{"!/print(5 Minute Dummy Test Concluded - Profile Stopped)"},
-	--{"!/stopattack"},
-	{"!/cleartarget"},
- }, {"player.time >= 300", "@cute.dummy()"}},
- 
- {"pause", {	--Pause Rotation
-	"@cute.Pause()"
-}}, 
 
- {"!/click PE_Buttons_multitarget", {	--Toggle AoE
-	"modifier.rshift",
+ { 'pause', cute.checkDummy },	--5 Minute Dummy Test
+
+ 
+ {"/pe aoe", {	--Toggle AoE
+	"modifier.rshift"
  }},
  
- {"!/pe cd", {	--Toggle Cooldowns
+ {"/pe cd", {	--Toggle Cooldowns
 	"modifier.rcontrol",
  }},
  
- {"768", { 		--Cat Form
-	"@cute.CF()",
+ {{				--Cat Form
+	{"/cancelform /run CastSpellByID("..cf..")", { --In Shapeshift
+		"player.form !=0"
+	}},
+	{cf, {	--Not In Shapeshift
+		"player.form = 0"
+	}},
+ },{
+		"target.exists", 
+		"target.alive", 
+		"target.enemy",
+		"!player.buff("..cf..")",
+		"player.health > 20",
+		"!modifier.last("..cf..")"
  }},
- 
+
  {{		--Interrupts
- 
-	{"33786", {		--Cyclone: Focus Target
-		"@cute.Cy()",
-		"player.spell(33786).cooldown = 0",
-		"player.spell(33786).exists"
-	}, "focus"},
-	
-	{"5211", {		--Mighty Bash
-		"player.spell(5211).cooldown = 0",	--Mighty Bash
-		"player.range <= 8",
-		"player.spell(80965).cooldown != 0",	--Skull Bash
-		"player.spell(80965).cooldown <= 14",	--Skull Bash
-		"target.casting",
-		"player.spell(5211).exists"
-	}, "target"}, 
-	
-	{"80965", {		--Skull Bash
-		"player.spell(80965).cooldown = 0",	--Skull Bash
-		"target.casting",
-		"player.spell(80965).exists"
-	}, "target"},
-	
-	-- {"132469", {	--Typhoon
-		-- "player.spell(132469).cooldown = 0",	--Typhoon
-		-- "player.spell(80965).cooldown != 0",
-		-- "player.spell(5211).cooldown != 0",
-		-- "target.casting"
-	-- }, "target"}, 
-	
-	{"22570", {		--Maim
-		"@cute.MA()",
-		"player.spell(22570).cooldown != 0",	--Skull Bash
-		"target.casting",
-		"player.combopoints > 0",
-		"player.energy >= 35"
-	}, "target"}, 
-	
+	{{
+		{cy, {		--Cyclone: Focus Target
+			"player.spell("..cy..").cooldown = 0",
+			"player.level >= 78",
+		}, "focus"},
+		{mb, {		--Mighty Bash
+			"player.spell("..mb..").cooldown = 0",	--Mighty Bash
+			"player.range <= 8",
+			"player.spell("..sb..").cooldown != 0",	--Skull Bash
+			"player.spell("..sb..").cooldown <= 14",	--Skull Bash
+			"player.level >= 75",
+		}, "target"},
+		{sb, {		--Skull Bash
+			"player.spell("..sb..").cooldown = 0",	--Skull Bash
+			"player.level >= 64",
+		}, "target"},	
+		{ma, {		--Maim
+			"target.player",
+			"player.spell("..sb..").cooldown != 0",	--Skull Bash
+			"player.combopoints > 0",
+			"player.power >= 35",
+			"player.level >= 82",
+		}, "target"}, 
+	},{
+		"target.casting"
+	}},
   }, "modifier.interrupts"},
   
  {{		--Defensives
- 
-	{"22812", {		--Barkskin
-		"!player.buff(5215)",	--Prowl
-		"player.health <= 50",
-		"player.spell(22812).exists"
-	}}, 
-	
-	{"106922", {	--Might of Ursoc
-		"!player.buff(5215)",	--Prowl
-		"player.health <= 30",
-		"player.spell(106922).exists"
-	}}, 
-	
-	{"61336", {		--Survival Instincts
-		"!player.buff(5215)",	--Prowl
-		"player.health <= 25",
-		"player.spell(61336).exists"
-	}}, 
-	
-	{"22842", {		--Frenzied Regeneration
-		"!player.buff(5215)",	--Prowl
-		"player.buff(106922)",
-		"player.spell(22842).exists"
-	}}, 
-	
-	{"768", {		--Cat Form (Return from Might of Ursoc)
-		"!player.buff(768)",
-		"player.buff(106922)",
-		"player.buff(22842)",
-	}},
-	
-	{"20484", {		--Rebirth
-		"@cute.RB()",
+	{{
+		{bar, {		--Barkskin
+			"player.health <= 50",
+			"player.level >= 44",
+		}}, 
+		{mu, {	--Might of Ursoc
+			"player.health <= 30",
+			"player.level >= 72",
+		}}, 
+		{si, {		--Survival Instincts
+			"player.health <= 25",
+			"player.level >= 56",
+		}},
+		{"/cancelform /run CastSpellByID("..rej..")", {		--Rejuvination
+			"player.form != 0",
+			"!player.buff("..rej..")",
+			"!player.buff("..how..")",
+			"player.health <= 20",
+		}},
+		{rej, {
+			"player.form = 0",
+			"!player.buff("..rej..")",
+			"player.health <= 20",
+		}},
+		{fr, {		--Frenzied Regeneration
+			"player.buff("..mu..")",
+			"player.level >= 72",
+			"player.spell("..fr..").casted < 1",
+		}}, 
+		{"/cancelform", { --(Return from Might of Ursoc)
+			"player.buff("..bf..")",
+			"!player.buff("..how..")",
+		}},	
+	},{
+		"!player.buff("..prl..")",	--Prowl
+		"!player.buff(80169)",	--Food
+		"!player.buff(87959)",	--Drink
 		"!player.casting",
-		"player.buff(69369)",	--Predatory Swiftness
-		--"player.spell(20484).cooldown = 0"
-	}, "mouseover"}, 
-	
- },},
- 
- {{		--Cooldowns
- 
-	{"26297", {		--Racial: Troll Berserking
-		"player.spell(26297).exists",	--Racial: Troll Berserking
-		"!player.buff(5215)",			--Prowl
-		"player.energy >= 75",
-		"player.buff(127538)",			--Savage Roar
-		"player.buff(5217)",			--Tiger's Fury
-		"player.range <= 8"
+		"player.alive",
 	}}, 
-	
-	{"#gloves", {	--Profession: Engineering Hands
-		"!player.buff(5215)",	--Prowl
-		"player.energy >= 75",
-		"player.buff(127538)",	--Savage Roar
-		"player.buff(5217)",	--Tiger's Fury
-		"!player.buff(106951)",	--Berserk
-		"player.range <= 8"
-	}}, 
-	
-	{"106951", {	--Berserk
-		"@cute.Ber()",
-	}}, 
-	
-	{"106731", {	--Tier 4 Talent: Incarnation - King of the Jungle
-		"@cute.KotJ()",
-		"player.spell(106731).exists",	--King of the Jungle
-		"!player.buff(5215)",	--Prowl
-		"player.buff(127538)",	--Savage Roar
-		"player.buff(5217)",	--Tiger's Fury
-		"player.buff(106951)",	--Berserk
-		"player.range <= 8",
-		"player.spell(106731).exists"	--Incarnation
-	}}, 
-	
-	{"106737", {	--Tier 4 Talent: Force of Nature
-		"@cute.FoN()",
-		"player.spell(106737).exists",	--Force of Nature
-		"!player.buff(5215)",				--Prowl
-		"player.spell(106737).cooldown = 0",	--Force of Nature
-		"player.range <= 8"
-	}}, 
-
-	{"124974", {	--Tier 6 Talent: Nature's Vigil
-		"@cute.NV()",
-		"player.spell(124974).exists",	--Nature's Vigil
-		"!player.buff(5215)",			--Prowl
-		"player.energy >= 75",
-		"player.buff(127538)",			--Savage Roar
-		"player.buff(5217)",			--Tiger's Fury
-		"player.range <= 8"
-	}}, 
-	
- }, "modifier.cooldowns"},
+ }},
  
  {{		--Multitarget Rotation
-	 
-	{"770", {	--Faerie Fire AoE
-		"@cute.FF()",
-		"player.range <= 8",
-		"target.health > 25",
-		"player.spell(770).cooldown = 0", --Faerie Fire
-		"!target.debuff(113746)", --Weakened Armor
-		"!player.buff(5215)" --Prowl
-	}, "target"}, 
 	
-	{"127538", {	--Savage Roar AoE
-		"@cute.SR()",
-		"player.buff(768)", --Cat Form
-		"player.range <= 20"
+	{ff, {		--Faerie Fire AoE
+		"player.level >= 28",
+		"target.range <= 8",
+		"target.health > 25",
+		"player.spell("..ff..").cooldown = 0", --Faerie Fire
+		"!target.debuff("..wa..")", --Weakened Armor
+		"!player.buff("..prl..")" --Prowl
+	}, "target"},
+	
+	{{				--Savage Roar AoE
+		{{			--In-Combat - No Savage Roar
+			{svr, {	--No Glyph
+				"player.combopoints > 0",
+				"!player.glyph(127540)"
+			}}, 
+			{svg, {--Glyph
+				"player.glyph(127540)"
+			}},
+		},{
+			"player.srr <= 1",
+			"player.power >= 25"
+		}},
+	},{
+		"!player.buff("..how..")",
+		"player.buff("..cf..")",
+		"target.enemy",
+		"target.alive",
+		"target.range < 10",
+		"player.level >= 18"
 	}},
 	
-	{"5217", {  	--Tiger's Fury AoE
-		"player.buff(768)", --Cat Form
-		"player.spell(5217).cooldown = 0", --Tiger's Fury
+	{tf, {  	--Tiger's Fury AoE
+		"player.buff("..cf..")", --Cat Form
+		"player.spell("..tf..").cooldown = 0", --Tiger's Fury
 		"player.range <= 8",
-		"player.energy < 35",
-		"!player.buff(106951)", --Berserk
-		"!player.buff(135700)" --Clearcasting
+		"player.power < 35",
+		"!player.buff("..ber..")", --Berserk
+		"!player.buff("..cc..")" --Clearcasting
 	}}, 
 	
-	{"106830", {	--Thrash AoE
-		"@cute.ThrAoE()",
-		"player.buff(768)", --Cat Form
+	{{				--Thrash AoE
+		{thr, {	
+			"player.rrr > 0",
+		}},
+		{thr, {	
+			"player.thrr < 3",
+		}},
+		{thr, {	
+			"player.buff("..tf..")",
+		}},
+	},{
+		"player.thrr < 9",
+		"player.power >= 50",
+		"player.buff("..cf..")", --Cat Form
 		"player.level >= 28",
 		"player.range <= 8"
 	}},
 	
-	{"1079", {		--Rip AoE
+	{rp, {		--Rip AoE
+		"player.rpr < 2",
+		"player.power >= 30",
+		"target.ttd > 4",
 		"player.combopoints >= 5",
-		"player.buff(768)", --Cat Form
-		"player.buff(127538)", --Savage Roar
-		"!player.buff(135700)", --Clearcasting
+		"player.buff("..cf..")", --Cat Form
+		"player.srr > 0", --Savage Roar
+		"!player.buff("..cc..")", --Clearcasting
 		"player.range <= 8"
 	}},
 	
-	{"1822", {		--Rake AoE
-		"@cute.RkAoE()",
-		"player.buff(768)", --Cat Form
-		"player.range <= 8",
-		"!player.buff(135700)",	--Clearcasting
-		"player.buff(127538)" --Savage Roar
-	}},
+	{rk, {		--Rake AoE
+		"player.rkr < 3",
+		"player.power >= 35",
+		"!player.buff("..cc..")",	--Clearcasting
+		"player.srr > 0",
+		"target.ttd >= 15",
+		"target.enemy",
+		"target.alive",
+		"target.range < 8"
+	}, "target"}, 
 	
-	{"62078", {		--Swipe
-		"player.buff(768)", --Cat Form
-		"player.range <= 8",
-		"player.buff(127538)", --Savage Roar
-		"target.debuff(106830).duration > 0",	--Thrash
+	{sw, {		--Swipe
+		"player.srr > 0",
+		"player.power >= 45",
+		"target.enemy",
+		"target.alive",
+		"target.range < 8",
+		"player.level >= 22"
 	}},
-	
+		
  }, "modifier.multitarget"},
  
  {{		--Single Rotation
-	{"106830", {	--Thrash - Clearcasting Proc
-		"@cute.ThrCC()"
-	}},
  
-	{"127538", {	--Savage Roar
-		"@cute.SR()",
-	}}, 
+	{thr, {	--Thrash - Clearcasting Proc
+		"player.buff("..cc..")",
+		"player.thrr <= 3",
+		"player.rpr > 3",
+		"player.rkr > 3",
+		"player.buff("..cf..")",
+		"player.level >= 28",
+		"target.range < 8",
+		"target.ttd >= 6",
+	}},
 	
-	{"770", {		--Faerie Fire
-		"@cute.FF()",
-		"player.range <= 8",
+	{ff, {		--Faerie Fire
+		"player.level >= 28",
+		"target.range <= 8",
 		"target.health > 25",
-		"player.spell(770).cooldown = 0", --Faerie Fire
-		"!target.debuff(113746)", --Weakened Armor
-		"!player.buff(5215)" --Prowl
+		"player.spell("..ff..").cooldown = 0", --Faerie Fire
+		"!target.debuff("..wa..")", --Weakened Armor
+		"!player.buff("..prl..")" --Prowl
 	}, "target"},
 	
-	{"5217", {  	--Tiger's Fury
-		"@cute.TF()",
+	{{				--Savage Roar
+		{{			--In-Combat - No Savage Roar
+			{svr}, 
+			{svg},
+		},{
+			"player.srr <= 1",
+			"player.power >= 25"
+		}},
+		{{			--Advanced Refresh Logic
+			{svr}, 
+			{svg},
+		},{
+			"player.power >= 25",
+			"player.srrpdiff <= 4",
+			"player.srt",
+			"player.rpr < 10",
+			"player.rpr > 0"
+		}},
+	},{
+		"!player.buff("..how..")",
+		"player.buff("..cf..")",
+		"target.enemy",
+		"target.alive",
+		"target.range < 10",
+		"player.level >= 18"
+	}},
+	
+	{tf, {  	--Tiger's Fury
+		"player.power <= 35",
+		"player.spell("..tf..").cooldown = 0",
+		"target.range < 8",
+		"!player.buff("..ber..")",
+		"!player.buff("..cc..")",
 	}}, 
 	
-	{"106830", { 	--Thrash
-		"@cute.Thr()",
-	}, "target"}, 
+ {{		--Cooldowns
+	{{
+		{{
+			{rber, {		--Racial: Troll Berserking
+				"player.power >= 75",
+			}}, 
+			{"#gloves", {	--Profession: Engineering Hands
+				"player.power >= 75",
+				"!player.buff("..ber..")",	--Berserk
+			}}, 
+			{ber, {			--Berserk
+				"player.energy >= 75",
+				"player.spell("..tf..").cooldown > 6",
+				"target.ttd >= 18",
+				"target.boss(true)"
+			}}, 
+			{inb, {			--Tier 4 Talent: Incarnation - King of the Jungle
+				"target.ttd >= 15",
+				"player.buff("..ber..")",	--Berserk
+			}},
+			{nv, {	--Tier 6 Talent: Nature's Vigil
+				"target.ttd >= 15",
+				"player.power >= 75",
+			}}, 
+		},{
+			"player.srr > 0",			--Savage Roar
+			"player.buff("..tf..")",			--Tiger's Fury
+		}},
+		{{					--Tier 4 Talent: Force of Nature
+			{{
+				{fon, {	
+					"player.dex > 0",
+					"player.dex <= 1",
+				}},
+				{fon, {	
+					"player.buff(146310)",
+				}},
+				{fon, {
+					"player.rscr < 5",
+					"player.rscbuff = 10",
+				}},
+				{fon, {
+					"player.rrr > 0",
+					"player.rrr < 1",
+				}},
+				{fon, {	
+					"target.ttd < 20",
+				}},
+			},{			
+				"player.spell("..fon..").charges > 0"
+			}},
+			{fon, {	
+				"player.spell("..fon..").charges = 3",
+				"player.rrr = 0",
+				"player.rscr = 0",
+				"player.spell("..fon..").casted < 1",
+			}},
+		},{
+			"player.level >= 60",
+			"player.spell("..fon..").cooldown = 0",	--Force of Nature
+		}}, 
+	},{
+		"player.buff("..cf..")",				--Cat Form
+		"!player.buff("..prl..")",			--Prowl
+		"player.range <= 8"
+	}}	
+ }, "modifier.cooldowns"},
+
+	{{				--Thrash
+		{thr, {	--Rune of Reorigination
+			"player.thrr < 9",
+			"player.rrr > 0",
+			"player.rrr <= 1.5",
+			"player.rpr > 0",
+		}},
+		{thr, {	--About to Expire/Expired
+			"player.thrr <= 3",
+			"player.rpr > 3",
+			"player.rkr > 3",
+		}},
+	},{
+		"!player.buff("..cc..")",
+		"player.buff("..cf..")",
+		"player.level >= 28",
+		--"player.power >= 50",
+		"target.range < 8",
+		"target.ttd >= 6",
+	}},
 	
-	{"22568", { 	--Ferocious Bite
-		"@cute.FB()",
+	{{				--Ferocious Bite	
+		{{
+			{fb, {
+				"target.ttd <= 4"
+			}},
+			{fb, {
+				"player.rpr > 0",
+				"player.rpr <= 4"
+			}},
+		},{
+			"target.health <= 25"
+		}},
+		{fb, {
+			"player.rpp < 108",
+			"player.rpr > 6",
+			"player.combopoints >= 5",
+			"player.power >= 50"
+		}},
+	},{
+		"player.buff("..cf..")",
+		"player.power >= 25",
+		"player.rrr = 0",
+		"player.srr > 0",
+		"target.enemy",
+		"target.alive",
+		"target.range < 8"
 	}, "target"},
+		
+	{{				--Healing Touch
+		{ht, {	--Buff about to Expire
+			"player.buff("..ps..").duration < 1.5",
+		}, "lowest"},
+		{ht, {	--4 Combo Points (buffed Bleeds)
+			"player.combopoints >= 4",
+		}, "lowest"},
+	},{
+		"player.buff("..ps..")",	--Predatory Swiftness
+		"!player.buff("..dcd..")",	--Dream of Cenarious
+		"player.level >= 26"
+	}},
 	
-	-- {"5185", { --Healing Touch - Lowest Raid Member
-		-- "@cute.HT()",
-		-- "lowest.exists",
-	-- }, "lowest"},
+	{{				--Rip
+		{rp, {	--Rune of Reorigination
+			"player.combopoints = 4", 
+			"player.rpp >= 95",
+			"target.ttd > 30",
+			"player.rrr > 0",
+			"player.rrr <= 1.5",
+		}, "target"},
+		{{
+			{rp, {	--Doesn't Exists
+				"player.rpr = 0",
+			}, "target"},
+			{{
+				{rp, {	--About to Expire
+					"player.rpr < 6",
+					"target.health > 25",
+				}, "target"},
+				{rp, {	--MOAR BLEEDS!
+					"player.rpp > 108",
+					"player.rscbuff = 0",
+				}, "target"},
+				{rp, {	--Fail-a-taki's Soul Charm
+					"player.rpp > 108",
+					"player.rscbuff >= 7",
+				}, "target"},
+			},{
+				"target.ttd >= 15",
+			}},
+		},{
+			"player.combopoints >= 5",
+		}},
+	},{
+		--"player.power >= 30",
+		"player.level >= 20",
+		"player.srr > 1",
+		"target.ttd > 4",
+	}},
 	
-	{"5185", {		--Healing Touch - Self Default
-		"@cute.HT()",
-	}, "player"}, 
-	
-	{"1079", {		--Rip
-		"@cute.RP()",
-	}, "target"}, 
-	
-	{"1822", {		--Rake
-		"@cute.RK()",
-	}, "target"}, 
-	
-	{"6785", {		--Ravage: Combo Point Building
-		"@cute.FRvg()",
+	{{				--Rake
+		{rk, {		--Rune of Reorigination
+			"player.rrr > 0.5",
+			"player.rkr < 9",
+			"player.rrr <= 1.5",
+		}, "target"}, 
+		{rk, {		--About to Fall Off
+			"player.rkr < 3",
+		}, "target"},
+		{rk, {		--MOAR BLEEDS!
+			"player.rerk",
+			"player.rscbuff = 0",
+		}, "target"},
+		{rk, {		--Fail-a-taki's Soul Charm
+			"player.rerk",
+			"player.rscbuff >= 9",
+		}, "target"},
+	},{
+		"target.range < 8",
+		"player.srr > 1",
+		"player.power >= 35",
+	}},
+
+	{{				--Filler
+		{rvf, {		--Ravage - King of the Jungle
+			"player.buff("..inb..")",
+			--"player.power >= 45",
+		}},
+		{rvf, {		--Ravage - Stampede Buff
+			"player.buff("..spd..")",
+		}},
+		{rk, {		--Rake Filler
+			"player.rkfil",
+		}},
+		{{			--Shred
+			{{	--Berserk
+				{shg, {	--Berserk (w/ Glyph)
+					"player.glyph(114234)",
+				}},
+				{shr, {		--Berserk (w/o Glyph)
+					"!player.glyph(114234)",
+				}},
+			},{
+				"player.buff("..ber..")",
+			}},
+			{{	--Clearcasting
+				{shg, {	--Clearcasting (w/ Glyph)
+					"player.glyph(114234)",
+				}},
+				{shr, {		--Clearcasting (w/o Glyph)
+					"!player.glyph(114234)",
+				}},
+			},{
+				"player.buff("..cc..")",
+			}},
+			{{	--High Regen
+				{shg, {	--High Regen (w/ Glyph)
+					"player.glyph(114234)",
+				}},
+				{shr, {		--High Regen (w/o Glyph)
+					"!player.glyph(114234)",
+				}},
+			},{
+				"player.regen >= 15",
+			}},
+		},{
+			"player.canshr",
+			--"player.power >= 45",
+			"!player.buff("..inb..")",
+		}},
+		{mgl, {		--Mangle
+			--"player.power >= 35",
+			"!player.buff("..inb..")",
+		}},
+	},{
+		"player.buff("..cf..")",
+		"target.range < 8",
+		"player.combopoints < 5",
+		"target.enemy",
+		"target.alive",
 	}, "target"},
-	
-	{"1822", {		--Rake: Combo Point Building
-		"@cute.RkF()",
-	}, "target"},
-	
-	{"5221", {		--Shred: Combo Point Building
-		"@cute.ShrF()",
-	}, "target"}, 
-	
-	{"33876", { 	--Mangle: Combo Point Building
-		"@cute.MglF()",
-	}, "target"}, 
 	
  }, "!modifier.multitarget"},
  
  },
  
  {	-- Out of Combat
- 
-	{"!/click PE_Buttons_multitarget", {	--Toggle AoE
-		"modifier.rshift",
+
+	{"/pe aoe", {	--Toggle AoE
+		"modifier.rshift"
 	}},
  
-	{"!/pe cd", {	--Toggle Cooldowns
-		"modifier.rcontrol",
+	{"/pe cd", {	--Toggle Cooldowns
+		"modifier.rcontrol"
+	}},
+	
+	{{	--Aquatic Form
+		{"/cancelform /run CastSpellByID("..af..")", {		--In Shapeshift
+			"player.form != 0"
+		}, "player"},
+		{"af", {	--Not In Shapeshift
+			"player.form = 0",
+		}},
+	},{
+		"player.swimming", 
+		"!player.buff(af)" 
+	}},
+	
+	{{				--Mark of the Wild
+		{"/cancelform /run CastSpellByID("..mow..")", {		--In Shapeshift
+			"player.form != 0"
+		}, "player"},		
+		{mow, {  --Not In Shapeshift	
+			"player.form = 0",
+		}, "player"},
+	},{
+		"!player.buff(115921).any",
+		"!player.buff(20217).any",
+		"!player.buff(1126).any",
+		"!player.buff(90363).any",
+		"!player.buff("..sff..")",
+		"player.level >= 62",
+		"!player.buff(104934)", --Eating
+		"!player.buff(104269)", --Drinking	
+	}},  
+	
+	{{				--Revive
+		{"/cancelform /run CastSpellByID("..rv..")", {		--In Shapeshift
+			"player.form != 0"
+		}},
+		{rv, {	--Not In Shapeshift
+			"player.form = 0"
+		}},
+	},{
+		"mouseover.exists",
+		"mouseover.dead",
+		"mouseover.isPlayer",
+		"mouseover.range < 40",
+		"player.level >= 12"
+	}, "mouseover"},
+	
+	{{				--Remove Corruption
+		{"/cancelform /run CastSpellByID("..rc..")", {		--In Shapeshift
+			"player.form != 0"
+		}},
+		{rc, {	--Not In Shapeshift
+			"player.form = 0"
+		}},
+	},{
+		"player.dispellable("..rc..")"
 	}},
  
-	-- {"50769", {	--Revive
-		-- "@cute.RV()",
-		-- "!player.casting",
-	-- }, "mouseover"},
+	{{				--Cat Form
+		{"/cancelform /run CastSpellByID("..cf..")", { --In Shapeshift
+			"player.form !=0"
+		}},
+		{cf, {	--Not In Shapeshift
+			"player.form = 0"
+		}},
+	},{
+		"target.exists", 
+		"target.alive", 
+		"target.enemy",
+		"!player.buff(768)",
+		"player.health > 20",
+		"!modifier.last(768)"
+	}},
  
-	{"768", { 		--Cat Form
-		"@cute.CF()",
+	{{				--Rejuvination
+		{"/cancelform /run CastSpellByID("..rej..")", {		--In Shapeshift
+			"player.form != 0"
+		}},
+		{rej, {	--Not In Shapeshift
+			"player.form = 0"
+		}},
+	},{
+		"!player.buff("..prl..")",	--Prowl
+		"!player.buff(80169)",	--Food
+		"!player.buff(87959)",	--Drink
+		"!player.casting",
+		"player.alive",
+		"!player.buff("..rej..")",
+		"player.health <= 70"
+		--"player.level < 26"
+	}}, 
+
+	{{				--Savage Roar
+		{svr}, 
+		{svg},
+	},{
+		"player.srr <= 1",
+		"player.buff("..prl..")",
+		"!player.buff("..how..")",
+		"player.buff("..cf..")",
 		"target.enemy",
 		"target.alive",
+		"target.range < 10",
 	}},
- 
-	{"1066", {		--Aquatic Form
-		"@cute.AF()",
-		"!player.casting",
-		"!player.buff(1066)"	--Aquatic Form
-	}}, 
- 
-	-- {"783", {		--Travel Form
-		-- "@cute.TrF()",
-		-- "!player.buff(768)",		--Cat Form
-		-- "player.moving"
-	-- }}, 
-
-	{"!/cancelform", {	--Unshapeshift - Rejuvination Cast
-		"!modifier.alt",
-		"!player.buff(5215)",	--Prowl
-		"!player.buff(80169)",	--Food
-		"!player.buff(87959)",	--Drink
-		"!player.casting",
-		"player.alive",
-		"!player.buff(774)",
-		"player.health <= 70",
-		"player.form != 0"
-	}}, 
- 
-	{"774", {		--Rejuvination
-		"@cute.Rej()",
-		"!modifier.alt",
-		"!player.buff(5215)",	--Prowl
-		"!player.buff(80169)",	--Food
-		"!player.buff(87959)",	--Drink
-		"!player.casting",
-		"player.alive",
-		"!player.buff(774)",
-		"player.health <= 70"
-	}}, 
- 
-	{"!/cancelform", {	--Unshapeshift - Mark of the Wild Cast
-		"@cute.MotW()",
-		"!player.buff(40120)",
-		"player.level >= 62",
-		"!player.buff(1126)",
-		"!player.buff(104934)", --Eating
-		"!player.buff(104269)", --Drinking	
-		"player.form != 0"
-	}}, 
- 
-	{"1126", {  	--Mark of the Wild
-		"@cute.MotW()",
-		"!player.buff(40120)",
-		"player.level >= 62",
-		"player.form = 0",
-		"!player.buff(104934)", --Eating
-		"!player.buff(104269)", --Drinking	
-	}, "player"},  
- 
-	{"5215", {		--Prowl
-		"@cute.Prl()",
+	
+	{prl, {		--Prowl
+		"!player.buff("..prl..")",
 		"target.enemy",
-		"target.alive"
-	}}, 
- 
-	{"127538", {	--Savage Roar
-		"@cute.SR()",
+		"target.alive",
+		"target.range < 20"
+	}},
+	
+	{rvg, {		--Ravage
+		"target.behind",
+		"player.buff("..prl..")",
+		"player.srr > 1",
+		"!target.player",
+		"player.combopoints < 5",
+		"player.power >= 45",
 		"target.enemy",
-		"target.alive"
-	}}, 
- 
-	{"Ravage", {		--Ravage - Opener
-		"@cute.Rvg()",
+		"target.alive",
+		"target.range < 8",
+	}, "target"},
+	
+	{pnc, {		--Pounce
+		"player.buff("..prl..")",
+		"target.player",
+		"target.behind",
+		"player.combopoints < 5",
+		"player.power >= 50",
+		"target.enemy",
+		"target.alive",
+		"target.range < 8"
+	}},
+	
+	{{				--Shred
+		{shr, {		--Shred (No Glyph)
+			"target.behind"			
+		}, "target"},
+		{shg, {		--Shred (Glyphed)
+			"player.buff("..ber..")",
+			"player.glyph(114234)"
+		}, "target"},
+	},{
+		"player.combopoints < 5",
+		"player.power >= 40",
+		"target.enemy",
+		"target.alive",
+		"target.range < 8",
+		"player.level >= 16"
+	}},
+			
+	{mgl, { 	--Mangle: Combo Point Building
+		"player.combopoints < 5",
+		"player.power >= 35",
+		"target.enemy",
+		"target.alive",
+		"target.range < 8"
 	}, "target"}, 
- 
-	{"9005", {		--Pounce
-		"@cute.Pnc()",
-	}, "target"}, 
- 
-	{"33876", {	--Mangle: Opener
-		"@cute.MglOp()",
-	}, "target"}, 
- 
-	{"pause", {	--Pause Rotation
-		"@cute.Pause()",
-	}}, 
  
  }
  )

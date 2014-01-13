@@ -5,13 +5,10 @@
 ## Dependencies: Probably
 
 #Libs
-libs\PQR_PQI.lua
-libs\tracker.lua
 libs\general.lua
 libs\initial.lua
-libs\abilities.lua
-#libs\pqiset.lua
-#libs\simlib.lua
+libs\tracker.lua
+libs\spells.lua
 
 #Rotations
 rotations\druid\feral.lua

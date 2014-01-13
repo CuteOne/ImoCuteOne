@@ -16,7 +16,7 @@ end
 function cute.Ber()	--Berserk
 	if cute.ubid(cute.p(),768)	--Cat Form
 		and cute.pow() >= 75
-		and cute.ubid(cute.p(), 52610)	--Savage Roar
+		and cute.ubid(cute.p(), 127538)	--Savage Roar
 		and cute.ubid(cute.p(), 5217)	--Tiger's Fury
 		and cute.sir(cute.gsi(33876),cute.t())
 		and cute.cd(5217) > 6
@@ -441,10 +441,10 @@ function cute.RkF() --Rake: Filler
 		and not IsStealthed() 
 		and cute.sir(cute.gsi(33876),cute.t()) 
 		and cute.cp() < 5 
+		and cute.rkp() > 108
 	then
-		if (cute.ttd(cute.t()) - cute.rkr()) > 3 
-			--and ((cute.crkd() * ((cute.rkr()/3) + 1)) - (cute.rkd() * (cute.rkr()/3))) > cute.mgld()
-			and ((cute.crkd() * ((cute.rkr()/3) + 1)) - (cute.rkd() * (cute.rkr()/3))) > cute.mgld()
+		if cute.ttd(cute.t()) - cute.rkr() > 3 
+			and cute.crkd() * ((cute.rkr()/3) + 1) - cute.rkd() * (cute.rkr()/3) > cute.mgld()
 		then
 			return true
 		else
